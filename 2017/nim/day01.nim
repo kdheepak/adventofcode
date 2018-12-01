@@ -4,7 +4,7 @@ proc solve(data: string): int =
 
     var s = 0
 
-    for i, c in data:
+    for i, c in data.strip():
         if (i == data.len - 1):
             if c == data[0]:
                 s = s + parseInt($c)
