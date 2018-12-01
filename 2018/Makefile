@@ -1,4 +1,5 @@
 
+all: day01
 
 day01:
 	time nim c -d:release --out:./nim/build/main nim/day01.nim
