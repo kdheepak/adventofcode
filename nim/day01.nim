@@ -1,12 +1,25 @@
 import strutils
 import intsets
 
-const data = readFile("./puzzle-1/input.txt")
+const data = readFile("./inputs/day01.txt")
+
+# Part 1
 
 var freq = 0
-var uniqueFreq : IntSet = initIntSet()
 
+for line in data.splitLines():
+    if line.strip() == "":
+        continue
+    freq = freq + parseInt(line)
+
+echo "Solution 1: ", freq
+
+# Part 2
+
+var uniqueFreq : IntSet = initIntSet()
 var should_loop_continue = true
+
+freq = 0
 
 while should_loop_continue:
 
@@ -20,5 +33,4 @@ while should_loop_continue:
             should_loop_continue = false
             break
 
-
-echo freq
+echo "Solution 2: ", freq
