@@ -1,3 +1,6 @@
 
 AOC2018:
 	$(MAKE) -C 2018 all
+
+AOC2017:
+	$(MAKE) -C 2017 all
