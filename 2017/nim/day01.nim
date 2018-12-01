@@ -13,7 +13,6 @@ proc solve(data: string): int =
 
     return s
 
-
 assert solve("1122") == 3
 assert solve("1111") == 4
 assert solve("1234") == 0
