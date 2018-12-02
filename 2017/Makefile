@@ -1,5 +1,5 @@
 
-all: day07
+all: day08
 
 day01:
 	time nim c --out:./nim/build/main nim/day01.nim
@@ -27,4 +27,8 @@ day06:
 
 day07:
 	time nim c --out:./nim/build/main nim/day07.nim
+	time ./nim/build/main
+
+day08:
+	time nim c --out:./nim/build/main nim/day08.nim
 	time ./nim/build/main
