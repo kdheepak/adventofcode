@@ -31,7 +31,7 @@ proc countWithSort(data: string): int =
         if s.len == passwords.len:
             result = result + 1
 
-const data = readFile("./inputs/day03.txt").strip()
+const data = readFile("./inputs/day04.txt").strip()
 
 echo "Solution1: ", count(data)
 echo "Solution2: ", countWithSort(data)
