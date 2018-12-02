@@ -1,4 +1,5 @@
 import math
+import tables
 
 proc distance(input: int) : int =
     if input == 1:
@@ -57,4 +58,51 @@ assert distance(23) == 2
 assert distance(1024) == 31
 assert distance(101) == 10
 
-echo "Solution: ", distance(347991)
+const puzzle = 347991
+echo "Solution1: ", distance(puzzle)
+
+type Square = tuple[x: int, y: int]
+var grid: Table[Square, int] = {(0, 0): 1}.toTable()
+
+func neighbours(square: Square): array[8, Square] =
+  let (x, y) = square
+  return [
+      (x+1, y),
+      (x+1, y+1),
+      (x, y+1),
+      (x-1, y+1),
+      (x-1, y),
+      (x-1, y-1),
+      (x, y-1),
+      (x+1, y-1),
+    ]
+
+
+proc fill(square: Square): int =
+    result = 0
+    for neighbour in square.neighbours:
+        result = result + grid.getOrDefault(neighbour)
+    grid[square] = result
+
+
+iterator proceed_in_spiral(): int =
+  var step = 0
+  while true:
+    step = step + 1
+    for y in countup( -step+1, step):
+        yield fill((step,  y))
+    for x in countdown(step-1, -step):
+        yield fill((x,  step))
+    for y in countdown(step-1, -step):
+        yield fill((-step, y))
+    for x in countup( -step+1, step):
+        yield fill((x, -step))
+
+
+for v in proceed_in_spiral():
+    if v > puzzle:
+        echo "Solution 2: ", v
+        break
+
+
+
