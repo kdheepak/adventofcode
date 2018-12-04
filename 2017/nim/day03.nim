@@ -61,11 +61,11 @@ assert distance(101) == 10
 const puzzle = 347991
 echo "Solution1: ", distance(puzzle)
 
-type Square = tuple[x: int, y: int]
-var grid: Table[Square, int] = {(0, 0): 1}.toTable()
+type Point = tuple[x: int, y: int]
+var grid: Table[Point, int] = {(0, 0): 1}.toTable()
 
-func neighbours(square: Square): array[8, Square] =
-  let (x, y) = square
+func neighbours(point: Point): array[8, Point] =
+  let (x, y) = point
   return [
       (x+1, y),
       (x+1, y+1),
@@ -78,11 +78,11 @@ func neighbours(square: Square): array[8, Square] =
     ]
 
 
-proc fill(square: Square): int =
+proc fill(point: Point): int =
     result = 0
-    for neighbour in square.neighbours:
+    for neighbour in point.neighbours:
         result = result + grid.getOrDefault(neighbour)
-    grid[square] = result
+    grid[point] = result
 
 
 iterator proceed_in_spiral(): int =
