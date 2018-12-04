@@ -20,3 +20,8 @@ day04:
 	# time nim c --out:./nim/build/main nim/day04.nim
 	# time ./nim/build/main
 	time python python/day04.py
+
+day05:
+	# time nim c --out:./nim/build/main nim/day04.nim
+	# time ./nim/build/main
+	time python python/day05.py
