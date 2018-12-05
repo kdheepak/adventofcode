@@ -1,5 +1,5 @@
 
-all: day04
+all: day05
 
 day01:
 	time nim c --out:./nim/build/main nim/day01.nim
