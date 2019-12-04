@@ -18,7 +18,7 @@ function points(line)
             x += directionX[d[1]]
             y += directionY[d[1]]
             length += 1
-            if !((x,y) in keys(ans))
+            if (x,y) ∉ keys(ans)
                 ans[(x,y)] = length
             end
         end
@@ -28,13 +28,11 @@ end
 
 
 function run()
-
     A = points(line1)
     B = points(line2)
 
-    minimum([(abs(k1) + abs(k2)) for (k1, k2) in intersect(keys(A), keys(B))])
-
-    minimum([(A[k] + B[k]) for k in intersect(keys(A), keys(B))])
-
+    println("Part 1: ", minimum([(abs(k1) + abs(k2)) for (k1, k2) in keys(A) ∩ keys(B)]))
+    println("Part 2: ", minimum([(A[k] + B[k]) for k in keys(A) ∩ keys(B)]))
 end
 
+run()
