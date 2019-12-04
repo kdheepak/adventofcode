@@ -1,3 +1,4 @@
+println(@__DIR__)
 data = open(joinpath(@__DIR__, "./../data/day01.txt")) do f
     readlines(f)
 end
@@ -17,3 +18,16 @@ function g(m)
 end
 
 println(sum(g(parse(Int, mass)) for mass in data if mass != ""))
+
+
+#--------------------------------------------------------------
+
+p = parse.(Int, readlines(joinpath(@__DIR__, "./../data/day01.txt")))
+f(x) = (x ÷ 3) - 2
+println(sum(f.(p)))
+
+function g(rem)
+    ret = f(rem)
+    ret <= 0 ? 0 : ret += g(ret)
+end
+println(sum(g, p))
