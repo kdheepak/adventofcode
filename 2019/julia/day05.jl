@@ -5,7 +5,8 @@ data = readlines(abspath(joinpath(@__DIR__, "../data/day05.txt")))
 INTCODE = [parse(Int, s) for s in split(data[1], ',')]
 
 function get_parameter(intcode, pos, idx, modes)
-    # modes is a one index vector of the mode for each parameter
+    # modes is one indexed vector of the mode for each parameter
+    # intcode is zero indexed
     return if modes[idx] == 1 # immediate
         intcode[pos + idx]
     elseif modes[idx] == 0 # position
