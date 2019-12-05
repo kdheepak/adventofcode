@@ -4,224 +4,101 @@ data = readlines(abspath(joinpath(@__DIR__, "../data/day05.txt")))
 
 INTCODE = [parse(Int, s) for s in split(data[1], ',')]
 
+function get_parameter(intcode, pos, idx, modes)
+    return if modes[idx] == 1 # immediate
+        intcode[pos + idx]
+    elseif modes[idx] == 0 # position
+        intcode[intcode[pos + idx]]
+    else
+        error("Unknown mode")
+    end
+end
+
 function f(intcode, input=1)
 
     intcode = OffsetArray(copy(intcode), -1)
-    position = 0
+    pos = 0
     output = -1
+    MAXIMUM_NUMBER_OF_PARAMETERS = 3
 
-    while intcode[position] != 99
+    while intcode[pos] != 99
 
-        op = intcode[position] % 100
+        op = intcode[pos] % 100
+        modes = digits(intcode[pos] ÷ 100)
+        while length(modes) < MAXIMUM_NUMBER_OF_PARAMETERS
+            push!(modes, 0)
+        end
 
-        if op == 1
-            modec = (intcode[position] ÷ 100) % 10
-            if modec == 0
-                c = intcode[intcode[position + 1]]
-            elseif modec == 1
-                c = intcode[position + 1]
+        if op == 1 # +
+            p1 = get_parameter(intcode, pos, 1, modes)
+            p2 = get_parameter(intcode, pos, 2, modes)
+            @assert modes[3] == 0 "Unknown mode]: $(intcode[pos])"
+            intcode[intcode[pos + 3]] = p1 + p2
+            pos += 4 # goto next instruction
+        elseif op == 2 # *
+            p1 = get_parameter(intcode, pos, 1, modes)
+            p2 = get_parameter(intcode, pos, 2, modes)
+            @assert modes[3] == 0 "Unknown mode: $(intcode[pos])"
+            intcode[intcode[pos + 3]] = p1 * p2
+            pos += 4 # goto next instruction
+        elseif op == 3 # input
+            intcode[intcode[pos + 1]] = input
+            pos = pos + 2
+        elseif op == 4 # output
+            p1 = get_parameter(intcode, pos, 1, modes)
+            @assert modes[2] == 0 "Unknown mode: $(intcode[pos])"
+            output = p1
+            if output != 0 && intcode[pos + 2] != 99
+                error("Something went wrong")
+            elseif output != 0 && intcode[pos + 2] == 99 # next instruction is 99
+                return output
             else
-                error("Unknown intcode[position]: $(intcode[position])")
+                @assert output == 0
             end
-
-            modeb = (intcode[position] ÷ 1000) % 10
-            if modeb == 0
-                b = intcode[intcode[position + 2]]
-            elseif modeb == 1
-                b = intcode[position + 2]
-            else
-                error("Unknown intcode[position]: $(intcode[position])")
-            end
-
-            if (intcode[position] ÷ 10000) % 10 == 0
-                intcode[intcode[position + 3]] = c + b
-            elseif (intcode[position] ÷ 10000) % 10 == 1
-                error("Output cannot be in immediate mode")
-            else
-                error("Unknown intcode[position]: $(intcode[position])")
-            end
-
-            position = position + 4
-
-        elseif op == 2
-            if (intcode[position] ÷ 100) % 10 == 0
-                c = intcode[intcode[position+1]]
-            elseif (intcode[position] ÷ 100) % 10 == 1
-                c = intcode[position + 1]
-            else
-                error("Unknown intcode[position]: $(intcode[position])")
-            end
-
-            if (intcode[position] ÷ 1000) % 10 == 0
-                b = intcode[intcode[position + 2]]
-            elseif (intcode[position] ÷ 1000) % 10 == 1
-                b = intcode[position + 2]
-            else
-                error("Unknown intcode[position]: $(intcode[position])")
-            end
-
-            if (intcode[position] ÷ 10000) % 10 == 0
-                intcode[intcode[position + 3]] = c * b
-            elseif (intcode[position] ÷ 10000) % 10 == 1
-                error("Output cannot be in immediate mode")
-            else
-                error("Unknown intcode[position]: $(intcode[position])")
-            end
-
-            position = position + 4
-
-        elseif op == 3
-            if (intcode[position] ÷ 100) % 10 == 0
-                b = intcode[position + 1]
-                # b = intcode[intcode[position+1]]
-            elseif (intcode[position] ÷ 100) % 10 == 1
-                # b = intcode[position + 1]
-                error("what")
-            else
-                error("Unknown intcode[position]: $(intcode[position])")
-            end
-
-            if (intcode[position] ÷ 1000) % 10 == 0
-                intcode[b] = input
-            elseif (intcode[position] ÷ 1000) % 10 == 1
-                error("Output cannot be in immediate mode")
-            else
-                error("Unknown intcode[position]: $(intcode[position])")
-            end
-
-            position = position + 2
-        elseif op == 4
-            if (intcode[position] ÷ 100) % 10 == 0
-                b = intcode[intcode[position+1]]
-            elseif (intcode[position] ÷ 100) % 10 == 1
-                b = intcode[position + 1]
-            else
-                error("Unknown intcode[position]: $(intcode[position])")
-            end
-
-            if (intcode[position] ÷ 1000) % 10 == 0
-                output = b
-                if output != 0 && intcode[position + 2] != 99
-                    error("Something went wrong")
-                elseif output != 0 && intcode[position + 2] == 99
-                    return output
-                else
-                    @assert output == 0
-                end
-            elseif (intcode[position] ÷ 1000) % 10 == 1
-                error("Output cannot be in immediate mode")
-            else
-                error("Unknown intcode[position]: $(intcode[position])")
-            end
-
-            position = position + 2
+            pos = pos + 2
         elseif op == 5 # jump-if-true
-
-            modec = (intcode[position] ÷ 100) % 10
-            if modec == 0
-                c = intcode[intcode[position + 1]]
-            elseif modec == 1
-                c = intcode[position + 1]
+            p1 = get_parameter(intcode, pos, 1, modes)
+            p2 = get_parameter(intcode, pos, 2, modes)
+            if p1 != 0 # if jump-if-non-zero
+                pos = p2
             else
-                error("Unknown intcode[position]: $(intcode[position])")
+                pos += 3 # goto next instruction
             end
-
-            modeb = (intcode[position] ÷ 1000) % 10
-            if modeb == 0
-                b = intcode[intcode[position + 2]]
-            elseif modeb == 1
-                b = intcode[position + 2]
+        elseif op == 6 # jump-if-false
+            p1 = get_parameter(intcode, pos, 1, modes)
+            p2 = get_parameter(intcode, pos, 2, modes)
+            if p1 == 0 # jump-if-zero
+                pos = p2
             else
-                error("Unknown intcode[position]: $(intcode[position])")
-            end
-
-            if c != 0
-                position = b
-            else
-                position += 3
-            end
-        elseif op == 6 # jump-if-true
-
-            modec = (intcode[position] ÷ 100) % 10
-            if modec == 0
-                c = intcode[intcode[position + 1]]
-            elseif modec == 1
-                c = intcode[position + 1]
-            else
-                error("Unknown intcode[position]: $(intcode[position])")
-            end
-
-            modeb = (intcode[position] ÷ 1000) % 10
-            if modeb == 0
-                b = intcode[intcode[position + 2]]
-            elseif modeb == 1
-                b = intcode[position + 2]
-            else
-                error("Unknown intcode[position]: $(intcode[position])")
-            end
-
-            if c == 0
-                position = b
-            else
-                position += 3
+                pos += 3 # goto next instruction
             end
         elseif op == 7 # less than
-            modec = (intcode[position] ÷ 100) % 10
-            if modec == 0
-                c = intcode[intcode[position + 1]]
-            elseif modec == 1
-                c = intcode[position + 1]
+            p1 = get_parameter(intcode, pos, 1, modes)
+            p2 = get_parameter(intcode, pos, 2, modes)
+            if p1 < p2
+                intcode[intcode[pos + 3]] = 1
             else
-                error("Unknown intcode[position]: $(intcode[position])")
+                intcode[intcode[pos + 3]] = 0
             end
-
-            modeb = (intcode[position] ÷ 1000) % 10
-            if modeb == 0
-                b = intcode[intcode[position + 2]]
-            elseif modeb == 1
-                b = intcode[position + 2]
-            else
-                error("Unknown intcode[position]: $(intcode[position])")
-            end
-            if c < b
-                intcode[intcode[position + 3]] = 1
-            else
-                intcode[intcode[position + 3]] = 0
-            end
-            position += 4
+            pos += 4
         elseif op == 8 # equal
-            modec = (intcode[position] ÷ 100) % 10
-            if modec == 0
-                c = intcode[intcode[position + 1]]
-            elseif modec == 1
-                c = intcode[position + 1]
+            p1 = get_parameter(intcode, pos, 1, modes)
+            p2 = get_parameter(intcode, pos, 2, modes)
+            if p1 == p2
+                intcode[intcode[pos + 3]] = 1
             else
-                error("Unknown intcode[position]: $(intcode[position])")
+                intcode[intcode[pos + 3]] = 0
             end
-
-            modeb = (intcode[position] ÷ 1000) % 10
-            if modeb == 0
-                b = intcode[intcode[position + 2]]
-            elseif modeb == 1
-                b = intcode[position + 2]
-            else
-                error("Unknown intcode[position]: $(intcode[position])")
-            end
-            if c == b
-                intcode[intcode[position + 3]] = 1
-            else
-                intcode[intcode[position + 3]] = 0
-            end
-            position += 4
+            pos += 4
         else
-            error("position: $(position), intcode[position]: $(intcode[position])")
+            error("pos: $(pos), intcode[pos]: $(intcode[pos])")
         end
     end
 
     return output
 end
 
-@show f(INTCODE, 1)
+@assert f(INTCODE, 1) == 16225258
 
 @assert f([3,9,8,9,10,9,4,9,99,-1,8], 7) == 0
 @assert f([3,9,8,9,10,9,4,9,99,-1,8], 8) == 1
@@ -235,4 +112,4 @@ end
 @assert f([3,3,1107,-1,8,3,4,3,99], 7) == 1
 @assert f([3,3,1107,-1,8,3,4,3,99], 8) == 0
 
-@show f(INTCODE, 5)
+@assert f(INTCODE, 5) == 2808771
