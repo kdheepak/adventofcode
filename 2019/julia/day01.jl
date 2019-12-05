@@ -1,4 +1,3 @@
-println(@__DIR__)
 data = open(joinpath(@__DIR__, "./../data/day01.txt")) do f
     readlines(f)
 end
