@@ -104,7 +104,6 @@ function f(intcode, input=1)
                 if output != 0 && intcode[position + 2] != 99
                     error("Something went wrong")
                 elseif output != 0 && intcode[position + 2] == 99
-                    @show output
                     return output
                 else
                     @assert output == 0
@@ -222,7 +221,7 @@ function f(intcode, input=1)
     return output
 end
 
-# @show f(INTCODE, 1)
+@show f(INTCODE, 1)
 
 @assert f([3,9,8,9,10,9,4,9,99,-1,8], 7) == 0
 @assert f([3,9,8,9,10,9,4,9,99,-1,8], 8) == 1
@@ -235,8 +234,5 @@ end
 
 @assert f([3,3,1107,-1,8,3,4,3,99], 7) == 1
 @assert f([3,3,1107,-1,8,3,4,3,99], 8) == 0
-
-
-
 
 @show f(INTCODE, 5)
