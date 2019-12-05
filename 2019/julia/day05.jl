@@ -32,7 +32,7 @@ function f(intcode::OffsetArray{Int, 1, Vector{Int}}, input=1)
         if op == 1 # +
             p1 = get_parameter(intcode, pos, 1, modes)
             p2 = get_parameter(intcode, pos, 2, modes)
-            @assert modes[3] == 0 "Unknown mode]: $(intcode[pos])"
+            @assert modes[3] == 0 "Unknown mode: $(intcode[pos])"
             intcode[intcode[pos + 3]] = p1 + p2
             pos += 4 # goto next instruction
         elseif op == 2 # *
