@@ -14,11 +14,11 @@ function get_parameter(intcode, pos, idx, modes)
     end
 end
 
-function f(intcode, input=1)
+f(intcode, input) = f(OffsetArray(copy(intcode), -1), input)
 
-    intcode = OffsetArray(copy(intcode), -1)
+function f(intcode::OffsetArray{Int, 1, Vector{Int}}, input=1)
     pos = 0
-    output = -1
+    output = nothing
     MAXIMUM_NUMBER_OF_PARAMETERS = 3
 
     while intcode[pos] != 99
@@ -43,19 +43,17 @@ function f(intcode, input=1)
             pos += 4 # goto next instruction
         elseif op == 3 # input
             intcode[intcode[pos + 1]] = input
-            pos = pos + 2
+            pos += 2 # goto next instruction
         elseif op == 4 # output
             p1 = get_parameter(intcode, pos, 1, modes)
             @assert modes[2] == 0 "Unknown mode: $(intcode[pos])"
             output = p1
             if output != 0 && intcode[pos + 2] != 99
                 error("Something went wrong")
-            elseif output != 0 && intcode[pos + 2] == 99 # next instruction is 99
-                return output
             else
-                @assert output == 0
+                @assert output == 0 || intcode[pos + 2] == 99
             end
-            pos = pos + 2
+            pos += 2 # goto next instruction
         elseif op == 5 # jump-if-true
             p1 = get_parameter(intcode, pos, 1, modes)
             p2 = get_parameter(intcode, pos, 2, modes)
@@ -80,7 +78,7 @@ function f(intcode, input=1)
             else
                 intcode[intcode[pos + 3]] = 0
             end
-            pos += 4
+            pos += 4 # goto next instruction
         elseif op == 8 # equal
             p1 = get_parameter(intcode, pos, 1, modes)
             p2 = get_parameter(intcode, pos, 2, modes)
@@ -89,12 +87,11 @@ function f(intcode, input=1)
             else
                 intcode[intcode[pos + 3]] = 0
             end
-            pos += 4
+            pos += 4 # goto next instruction
         else
-            error("pos: $(pos), intcode[pos]: $(intcode[pos])")
+            error("Something went wrong. pos: $(pos), intcode[pos]: $(intcode[pos])")
         end
     end
-
     return output
 end
 
