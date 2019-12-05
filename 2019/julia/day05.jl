@@ -91,6 +91,7 @@ function f(intcode::OffsetArray{Int, 1, Vector{Int}}, input=1)
         else
             error("Something went wrong. pos: $(pos), intcode[pos]: $(intcode[pos])")
         end
+
     end
     return output
 end
