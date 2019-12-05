@@ -5,6 +5,7 @@ data = readlines(abspath(joinpath(@__DIR__, "../data/day05.txt")))
 INTCODE = [parse(Int, s) for s in split(data[1], ',')]
 
 function get_parameter(intcode, pos, idx, modes)
+    # modes is a one index vector of the mode for each parameter
     return if modes[idx] == 1 # immediate
         intcode[pos + idx]
     elseif modes[idx] == 0 # position
@@ -22,6 +23,10 @@ function f(intcode::OffsetArray{Int, 1, Vector{Int}}, input=1)
     MAXIMUM_NUMBER_OF_PARAMETERS = 3
 
     while intcode[pos] != 99
+
+        # if intcode == [1001, 1, 1, _]
+        # op == 01
+        # modes == [1, 0]
 
         op = intcode[pos] % 100
         modes = digits(intcode[pos] ÷ 100)
