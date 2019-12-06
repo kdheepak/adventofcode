@@ -142,23 +142,3 @@ println(length(a_star(
     findfirst(==(you_orbiting), bodys),
     findfirst(==(san_orbiting), bodys))))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
