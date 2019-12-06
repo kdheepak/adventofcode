@@ -16,9 +16,9 @@ function get_parameter(intcode, pos, idx, modes)
     end
 end
 
-f(intcode, input) = f(OffsetArray(copy(intcode), -1), input)
+f(intcode, input) = f(OffsetVector(copy(intcode), -1), input)
 
-function f(intcode::OffsetArray{Int,1,Vector{Int}}, input = 1)
+function f(intcode::OffsetVector{Int,Vector{Int}}, input = 1)
     pos = 0
     output = nothing
     MAXIMUM_NUMBER_OF_PARAMETERS = 3
