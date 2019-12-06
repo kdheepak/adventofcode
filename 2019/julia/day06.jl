@@ -118,7 +118,8 @@ _, transfers = explore(orbits, reverse_mapping, "YOU")
 println(transfers)
 
 ###########################################################3
-
+# Doug K
+# https://slack-redir.net/link?url=https%3A%2F%2Fgithub.com%2Fdgkf%2Fadvent-of-code%2Fblob%2Fmaster%2F2019%2F06%2F06.jl&v=3
 using SparseArrays
 using LightGraphs
 
@@ -142,3 +143,48 @@ println(length(a_star(
     findfirst(==(you_orbiting), bodys),
     findfirst(==(san_orbiting), bodys))))
 
+#################################################################
+
+using DataStructures # Load data as a multimap
+
+orbits = MultiDict([
+    Pair(match(r"(\w+)\)(\w+)", row).captures...)
+    for row in data
+])# BFS with an explicit stack and a loop
+
+function count_orbits(orbits, nodes)
+    acc=0
+    depth=0
+    while length(nodes) > 0
+        acc += depth * length(nodes)
+        depth += 1
+        nodes = collect(Iterators.flatten(get(orbits.d, node, []) for node in nodes))
+    end
+    acc
+end
+
+@show count_orbits(orbits, ["COM"])
+
+function path_to(body, parents)
+    path = String[]
+    while body in keys(parents)
+        body = parents[body]
+        push!(path, body)
+    end
+    return reverse!(path)
+end
+
+function n_shared_prefix(a, b)
+    min_len = min(length(a), length(b))
+    for n in 1:min_len
+        a[n] != b[n] && return n-1
+    end
+    return min_len
+end
+
+function star2(parents)
+    you_path = path_to("YOU", parents)
+    santa_path = path_to("SAN", parents)
+    return length(you_path) + length(santa_path) -
+        2*n_shared_prefix(you_path, santa_path)
+end
