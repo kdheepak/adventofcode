@@ -22,7 +22,8 @@ mutable struct VM
     output::Union{Nothing, Int}
 end
 
-VM(code, input = 1) = VM(OffsetVector(code, -1), 0, false, input, nothing)
+VM(code, input = 1) = VM(OffsetVector(code, -1), input)
+VM(code::OffsetVector{Int, Vector{Int}}, input = 1) = VM(code, 0, false, input, nothing)
 
 function set_param(vm::VM, offset, value)
     vm.code[vm.code[vm.pointer + offset]] = value

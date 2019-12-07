@@ -6,64 +6,47 @@ end
 
 INTCODE = [parse(Int, s) for s in split(data[1], ',')]
 
-function f(intcode, a, b)
+include("vm.jl")
 
-    intcode = OffsetArray(copy(intcode), -1)
-    position = 0
-    intcode[1] = a
-    intcode[2] = b
+vm = VM([1,9,10,3,2,3,11,0,99,30,40,50])
+run(vm)
+@assert vm.code[0] == 3500
 
-    while intcode[position] != 99
+vm = VM([1,0,0,0,99])
+run(vm)
+@assert vm.code[0] == 2
 
-        op = if intcode[position] == 1
-            +
-        elseif intcode[position] == 2
-            *
-        else
-            error("position: $(position), intcode[position]: $(intcode[position])")
-        end
+vm = VM([2,3,0,3,99])
+run(vm)
+@assert vm.code[3] == 6
 
-        p1 = intcode[position+1]
-        p2 = intcode[position+2]
-        p3 = intcode[position+3]
+vm = VM([2,4,4,5,99,0])
+run(vm)
+@assert vm.code[end] == 9801
 
-        intcode[p3] = op(intcode[p1], intcode[p2])
+vm = VM([1,1,1,4,99,5,6,0,99])
+run(vm)
+@assert vm.code[0] == 30
 
-        position = position + 4
-    end
+# part 1
+intcode = OffsetVector(copy(INTCODE), -1)
+intcode[1] = 12
+intcode[2] = 2
+vm = VM(intcode)
+run(vm)
+@assert vm.code[0] == 4570637
 
-    return intcode[0]
-end
-
-println(f(INTCODE, 12, 2))
+# part 2
 
 for noun in 0:99
     for verb in 0:99
-        if f(INTCODE, noun, verb) == 19690720
-            println(noun * 100 + verb)
-            break
+        intcode = OffsetVector(copy(INTCODE), -1)
+        intcode[1] = noun
+        intcode[2] = verb
+        vm = VM(intcode)
+        run(vm)
+        if vm.code[0] == 19690720
+            @assert noun * 100 + verb == 5485
         end
     end
 end
-
-#---------------------------------------------------------------
-# Tom Kwong
-
-function run!(code, i = 0)
-    op = code[i]
-    op == 99 && return code[0]
-    execute!(Val(op), code, code[i+1:i+3]...)
-    run!(code, i+4)
-end
-
-execute!(::Val{1}, code, p1, p2, p3) = code[p3] = code[p1] + code[p2]
-
-execute!(::Val{2}, code, p1, p2, p3) = code[p3] = code[p1] * code[p2]
-
-intcode = OffsetArray(INTCODE, -1)
-intcode[1] = 12
-intcode[2] = 2
-
-run!(intcode)
-
-nothing
