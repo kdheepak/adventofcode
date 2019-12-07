@@ -108,42 +108,26 @@ end
 function evaluate!(vm::VM, op::Op{JumpIfTrue})
     p1 = get_param(vm, 1, op.modes[1])
     p2 = get_param(vm, 2, op.modes[2])
-    if p1 != 0
-        jmp(vm, p2)
-    else
-        incr(vm, 3)
-    end
+    p1 != 0 ? jmp(vm, p2) : incr(vm, 3)
 end
 
 function evaluate!(vm::VM, op::Op{JumpIfFalse})
     p1 = get_param(vm, 1, op.modes[1])
     p2 = get_param(vm, 2, op.modes[2])
-    if p1 == 0
-        jmp(vm, p2)
-    else
-        incr(vm, 3)
-    end
+    p1 == 0 ? jmp(vm, p2) : incr(vm, 3)
 end
 
 function evaluate!(vm::VM, op::Op{LessThan})
     p1 = get_param(vm, 1, op.modes[1])
     p2 = get_param(vm, 2, op.modes[2])
-    if p1 < p2
-        set_param(vm, 3, 1)
-    else
-        set_param(vm, 3, 0)
-    end
+    set_param(vm, 3, p1 < p2 ? 1 : 0)
     incr(vm, 4)
 end
 
 function evaluate!(vm::VM, op::Op{Equals})
     p1 = get_param(vm, 1, op.modes[1])
     p2 = get_param(vm, 2, op.modes[2])
-    if p1 == p2
-        set_param(vm, 3, 1)
-    else
-        set_param(vm, 3, 0)
-    end
+    set_param(vm, 3, p1 == p2 ? 1 : 0)
     incr(vm, 4)
 end
 
