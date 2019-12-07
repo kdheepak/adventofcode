@@ -25,11 +25,11 @@ function amplifiers_direct(data)
 
         put!(vmA.input, 0)
 
-        @async run!(vmA)
-        @async run!(vmB)
-        @async run!(vmC)
-        @async run!(vmD)
-        @async run!(vmE)
+        run!(vmA)
+        run!(vmB)
+        run!(vmC)
+        run!(vmD)
+        run!(vmE)
 
         maxoutput = max(maxoutput, take!(vmE.output))
     end
