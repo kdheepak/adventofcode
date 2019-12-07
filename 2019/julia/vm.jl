@@ -14,6 +14,23 @@ using OffsetArrays
     Halt = 99,
 )
 
+struct Op{T}
+    modes::Vector{Int}
+end
+
+function Op(opcode)
+    op = OpCodes(opcode % 100)
+    if op ∉ instances(OpCodes)
+        error("Unknown OpCode: $(op)")
+    end
+    modes = digits(opcode ÷ 100)
+    while length(modes) < 3
+        push!(modes, 0)
+    end
+    return Op{op}(modes)
+end
+
+
 mutable struct VM
     code::OffsetVector{Int, Vector{Int}}
     pointer::Int
@@ -55,12 +72,7 @@ end
 function run!(vm::VM)
     while !vm.halted
         opcode = vm.code[vm.pointer]
-        op = opcode % 100
-        modes = digits(opcode ÷ 100)
-        while length(modes) < 3
-            push!(modes, 0)
-        end
-        evaluate!(vm, op, modes)
+        evaluate!(vm, Op(opcode))
     end
     return vm.output
 end
@@ -68,43 +80,34 @@ end
 incr(vm::VM, offset::Int) = vm.pointer += offset
 jmp(vm::VM, pointer::Int) = vm.pointer = pointer
 
-function evaluate!(vm::VM, op::Int, m::Vector{Int})
-    if op ∈ instances(OpCodes)
-        evaluate!(vm, Val(OpCodes(op)), m)
-    else
-        error("Unknown OpCode: $(vm.code[vm.pointer:vm.pointer+4])")
-    end
-end
-
-function evaluate!(vm::VM, op::Val{Add}, modes::Vector{Int})
-    p1 = get_param(vm, 1, modes[1])
-    p2 = get_param(vm, 2, modes[2])
+function evaluate!(vm::VM, op::Op{Add})
+    p1 = get_param(vm, 1, op.modes[1])
+    p2 = get_param(vm, 2, op.modes[2])
     set_param(vm, 3, p1 + p2)
     incr(vm, 4)
 end
 
-function evaluate!(vm::VM, op::Val{Multiply}, modes::Vector{Int})
-    p1 = get_param(vm, 1, modes[1])
-    p2 = get_param(vm, 2, modes[2])
+function evaluate!(vm::VM, op::Op{Multiply})
+    p1 = get_param(vm, 1, op.modes[1])
+    p2 = get_param(vm, 2, op.modes[2])
     set_param(vm, 3, p1 * p2)
     incr(vm, 4)
 end
 
-function evaluate!(vm::VM, op::Val{Input})
+function evaluate!(vm::VM, op::Op{Input})
     set_param(vm, 1, take!(vm.input))
     incr(vm, 2)
 end
-evaluate!(vm::VM, op::Val{Input}, _) = evaluate!(vm, op)
 
-function evaluate!(vm::VM, op::Val{Output}, modes::Vector{Int})
-    p1 = get_param(vm, 1, modes[1])
+function evaluate!(vm::VM, op::Op{Output})
+    p1 = get_param(vm, 1, op.modes[1])
     put!(vm.output, p1)
     incr(vm, 2)
 end
 
-function evaluate!(vm::VM, op::Val{JumpIfTrue}, modes::Vector{Int})
-    p1 = get_param(vm, 1, modes[1])
-    p2 = get_param(vm, 2, modes[2])
+function evaluate!(vm::VM, op::Op{JumpIfTrue})
+    p1 = get_param(vm, 1, op.modes[1])
+    p2 = get_param(vm, 2, op.modes[2])
     if p1 != 0
         jmp(vm, p2)
     else
@@ -112,9 +115,9 @@ function evaluate!(vm::VM, op::Val{JumpIfTrue}, modes::Vector{Int})
     end
 end
 
-function evaluate!(vm::VM, op::Val{JumpIfFalse}, modes::Vector{Int})
-    p1 = get_param(vm, 1, modes[1])
-    p2 = get_param(vm, 2, modes[2])
+function evaluate!(vm::VM, op::Op{JumpIfFalse})
+    p1 = get_param(vm, 1, op.modes[1])
+    p2 = get_param(vm, 2, op.modes[2])
     if p1 == 0
         jmp(vm, p2)
     else
@@ -122,9 +125,9 @@ function evaluate!(vm::VM, op::Val{JumpIfFalse}, modes::Vector{Int})
     end
 end
 
-function evaluate!(vm::VM, op::Val{LessThan}, modes::Vector{Int})
-    p1 = get_param(vm, 1, modes[1])
-    p2 = get_param(vm, 2, modes[2])
+function evaluate!(vm::VM, op::Op{LessThan})
+    p1 = get_param(vm, 1, op.modes[1])
+    p2 = get_param(vm, 2, op.modes[2])
     if p1 < p2
         set_param(vm, 3, 1)
     else
@@ -133,9 +136,9 @@ function evaluate!(vm::VM, op::Val{LessThan}, modes::Vector{Int})
     incr(vm, 4)
 end
 
-function evaluate!(vm::VM, op::Val{Equals}, modes::Vector{Int})
-    p1 = get_param(vm, 1, modes[1])
-    p2 = get_param(vm, 2, modes[2])
+function evaluate!(vm::VM, op::Op{Equals})
+    p1 = get_param(vm, 1, op.modes[1])
+    p2 = get_param(vm, 2, op.modes[2])
     if p1 == p2
         set_param(vm, 3, 1)
     else
@@ -144,7 +147,6 @@ function evaluate!(vm::VM, op::Val{Equals}, modes::Vector{Int})
     incr(vm, 4)
 end
 
-function evaluate!(vm::VM, op::Val{Halt})
+function evaluate!(vm::VM, op::Op{Halt})
     vm.halted = true
 end
-evaluate!(vm::VM, op::Val{Halt}, _) = evaluate!(vm, op)
