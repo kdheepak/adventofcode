@@ -75,14 +75,14 @@ function evaluate!(vm::VM, op::Int, m::Vector{Int})
     end
 end
 
-function evaluate!(vm::VM, op::Val{Add}, modes)
+function evaluate!(vm::VM, op::Val{Add}, modes::Vector{Int})
     p1 = get_param(vm, 1, modes[1])
     p2 = get_param(vm, 2, modes[2])
     set_param(vm, 3, p1 + p2)
     incr(vm, 4)
 end
 
-function evaluate!(vm::VM, op::Val{Multiply}, modes)
+function evaluate!(vm::VM, op::Val{Multiply}, modes::Vector{Int})
     p1 = get_param(vm, 1, modes[1])
     p2 = get_param(vm, 2, modes[2])
     set_param(vm, 3, p1 * p2)
@@ -95,13 +95,13 @@ function evaluate!(vm::VM, op::Val{Input})
 end
 evaluate!(vm::VM, op::Val{Input}, _) = evaluate!(vm, op)
 
-function evaluate!(vm::VM, op::Val{Output}, modes)
+function evaluate!(vm::VM, op::Val{Output}, modes::Vector{Int})
     p1 = get_param(vm, 1, modes[1])
     put!(vm.output, p1)
     incr(vm, 2)
 end
 
-function evaluate!(vm::VM, op::Val{JumpIfTrue}, modes)
+function evaluate!(vm::VM, op::Val{JumpIfTrue}, modes::Vector{Int})
     p1 = get_param(vm, 1, modes[1])
     p2 = get_param(vm, 2, modes[2])
     if p1 != 0
@@ -111,7 +111,7 @@ function evaluate!(vm::VM, op::Val{JumpIfTrue}, modes)
     end
 end
 
-function evaluate!(vm::VM, op::Val{JumpIfFalse}, modes)
+function evaluate!(vm::VM, op::Val{JumpIfFalse}, modes::Vector{Int})
     p1 = get_param(vm, 1, modes[1])
     p2 = get_param(vm, 2, modes[2])
     if p1 == 0
@@ -121,7 +121,7 @@ function evaluate!(vm::VM, op::Val{JumpIfFalse}, modes)
     end
 end
 
-function evaluate!(vm::VM, op::Val{LessThan}, modes)
+function evaluate!(vm::VM, op::Val{LessThan}, modes::Vector{Int})
     p1 = get_param(vm, 1, modes[1])
     p2 = get_param(vm, 2, modes[2])
     if p1 < p2
@@ -132,7 +132,7 @@ function evaluate!(vm::VM, op::Val{LessThan}, modes)
     incr(vm, 4)
 end
 
-function evaluate!(vm::VM, op::Val{Equals}, modes)
+function evaluate!(vm::VM, op::Val{Equals}, modes::Vector{Int})
     p1 = get_param(vm, 1, modes[1])
     p2 = get_param(vm, 2, modes[2])
     if p1 == p2
