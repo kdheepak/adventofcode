@@ -27,8 +27,12 @@ function channel(v)
     foreach(x -> put!(c, x), v)
     return c
 end
+function outputs(c::Channel)
+    close(c)
+    return [o for o in c]
+end
 
-VM(code, input = Int[1], output = Int[]) = VM(OffsetVector(code, 0:(length(code) - 1)), input, output)
+VM(code, input = channel(Int[1]), output = channel(Int[])) = VM(OffsetVector(code, 0:(length(code) - 1)), input, output)
 VM(code::OffsetVector{Int, Vector{Int}}, input = channel(Int[1]), output = channel(Int[])) = VM(code, 0, false, input, output)
 
 function set_param(vm::VM, offset, value)
@@ -57,6 +61,7 @@ function run!(vm::VM)
         end
         evaluate!(vm, op, modes)
     end
+    return vm.output
 end
 
 incr(vm::VM, offset::Int) = vm.pointer += offset
@@ -142,5 +147,3 @@ function evaluate!(vm::VM, op::Val{Halt})
     vm.halted = true
 end
 evaluate!(vm::VM, op::Val{Halt}, _) = evaluate!(vm, op)
-
-outputs(vm::VM) = [o for o in vm.output]
