@@ -22,6 +22,7 @@ mutable struct VM
     output::Channel{Int}
 end
 
+# for reference https://github.com/kleinschmidt/adventofcode2019/commit/e6e22841c621b0682284875ff2eed92e00b5e0dd
 function channel(v)
     c = Channel{eltype(v)}(Inf)
     foreach(x -> put!(c, x), v)
