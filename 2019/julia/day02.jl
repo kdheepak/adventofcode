@@ -37,7 +37,6 @@ run(vm)
 @assert vm.code[0] == 4570637
 
 # part 2
-
 for noun in 0:99
     for verb in 0:99
         intcode = OffsetVector(copy(INTCODE), -1)
