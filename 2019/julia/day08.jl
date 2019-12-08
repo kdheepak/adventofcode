@@ -7,12 +7,7 @@ tdata = "123456789012"
 layers(data::String, wide, tall) = layers(Int[parse(Int, i) for i in strip(data)], wide, tall)
 layers(data::Vector{Int}, wide, tall) = reshape(data, wide, tall, length(data) ÷ (wide * tall))
 
-@assert layers(tdata, 3, 2)[:, :, 1] == [1 2 3; 4 5 6]'
-@assert layers(tdata, 3, 2)[:, :, 2] == [7 8 9; 0 1 2]'
-
-wide = 25
-tall = 6
-LAYERS = layers(data, wide, tall)
+LAYERS = layers(data, 25, 6)
 
 function corruption_check(layers)
     minz = Inf
@@ -29,6 +24,9 @@ function corruption_check(layers)
     twos = count(x -> x==2, minl)
     return ones * twos
 end
+
+@assert layers(tdata, 3, 2)[:, :, 1] == [1 2 3; 4 5 6]'
+@assert layers(tdata, 3, 2)[:, :, 2] == [7 8 9; 0 1 2]'
 
 @assert corruption_check(LAYERS) == 828
 
