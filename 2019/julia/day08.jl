@@ -14,13 +14,13 @@ function corruption_check(layers)
     minl = nothing
     for il in 1:size(layers)[3]
         l = layers[:, :, il]'
-        z = count(x -> x==0, l)
+        z = count(x -> x == 0, l)
         if min(minz, z) < minz
             minz = min(minz, z)
             minl = l
         end
     end
-    return count(x -> x==1, minl) * count(x -> x==2, minl)
+    return count(x -> x == 1, minl) * count(x -> x == 2, minl)
 end
 
 @assert layers(tdata, 3, 2)[:, :, 1] == [1 2 3; 4 5 6]'
