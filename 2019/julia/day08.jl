@@ -20,9 +20,7 @@ function corruption_check(layers)
             minl = l
         end
     end
-    ones = count(x -> x==1, minl)
-    twos = count(x -> x==2, minl)
-    return ones * twos
+    return count(x -> x==1, minl) * count(x -> x==2, minl)
 end
 
 @assert layers(tdata, 3, 2)[:, :, 1] == [1 2 3; 4 5 6]'
