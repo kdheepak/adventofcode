@@ -1,5 +1,3 @@
-using Crayons
-
 data = read(joinpath(@__DIR__, "../data/day08.txt"), String)
 
 tdata = "123456789012"
