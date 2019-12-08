@@ -41,7 +41,7 @@ function draw(image)
             c = result[row, col]
             c == 0 ? print(Crayon(), " ", Crayon(reset = true)) :
             c == 1 ? print(Crayon(background = :black), " ", Crayon(reset = true)) :
-            error("c != 1 || c != 0 : c = $c")
+            error("c != 1 && c != 0 ; c = $c")
         end
         println()
     end
