@@ -34,14 +34,12 @@ merge(pixel1::Int, pixel2::Int) = (pixel1 == 0 || pixel1 == 1) ? pixel1 : (pixel
 function draw(image)
     result = foldl(merge, [image[:, :, z] for z in 1:size(image)[3]])'
     rows, cols = size(result)
-    for row in 1:rows
-        for col in 1:cols
-            c = result[row, col]
-            c == 0 ? print(Crayon(), " ", Crayon(reset = true)) :
-            c == 1 ? print(Crayon(background = :black), " ", Crayon(reset = true)) :
-            error("c != 1 && c != 0 ; c = $c")
-        end
-        println()
+    for row in 1:rows, col in 1:cols
+        c = result[row, col]
+        c == 0 ? print(Crayon(), " ", Crayon(reset = true)) :
+        c == 1 ? print(Crayon(background = :black), " ", Crayon(reset = true)) :
+        error("c != 1 && c != 0 ; c = $c")
+        if (col == cols) println() end
     end
 end
 
