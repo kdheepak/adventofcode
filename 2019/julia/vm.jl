@@ -11,6 +11,7 @@ using OffsetArrays
     JumpIfFalse = 6,
     LessThan = 7,
     Equals = 8,
+    RelativeBaseOffset = 9,
     Halt = 99,
 )
 
@@ -21,7 +22,7 @@ end
 function Op(opcode)
     op = OpCodes(opcode % 100)
     if op ∉ instances(OpCodes)
-        error("Unknown OpCode: $(op)")
+        error("Unknown OpCode: $(opcode)")
     end
     modes = digits(opcode ÷ 100)
     while length(modes) < 3
@@ -37,6 +38,7 @@ mutable struct VM
     halted::Bool
     input::Channel{Int}
     output::Channel{Int}
+    relative_base_offset::Int
 end
 
 # for reference https://github.com/kleinschmidt/adventofcode2019/commit/e6e22841c621b0682284875ff2eed92e00b5e0dd
@@ -50,11 +52,21 @@ function outputs(c::Channel)
     return [o for o in c]
 end
 
-VM(code, input = channel(Int[1]), output = channel(Int[])) = VM(OffsetVector(code, 0:(length(code) - 1)), input, output)
-VM(code::OffsetVector{Int, Vector{Int}}, input = channel(Int[1]), output = channel(Int[])) = VM(code, 0, false, input, output)
+VM(code, input = channel(Int[]), output = channel(Int[])) = VM(OffsetVector(copy(code), 0:(length(code) - 1)), input, output)
 
-function set_param(vm::VM, offset, value)
-    vm.code[vm.code[vm.pointer + offset]] = value
+function VM(code::OffsetVector{Int, Vector{Int}}, input = channel(Int[]), output = channel(Int[]), maxsize = 2^16)
+    for _ in 1:maxsize
+        push!(code, 0)
+    end
+    return VM(code, 0, false, input, output, 0)
+end
+
+function set_param(vm::VM, offset, mode, value)
+    if mode == 2
+        vm.code[vm.code[vm.pointer + offset] + vm.relative_base_offset] = value
+    elseif mode == 0
+        vm.code[vm.code[vm.pointer + offset]] = value
+    end
 end
 
 function get_param(vm::VM, offset, mode)
@@ -64,6 +76,8 @@ function get_param(vm::VM, offset, mode)
         vm.code[vm.pointer + offset]
     elseif mode == 0 # position
         vm.code[vm.code[vm.pointer + offset]]
+    elseif mode == 2
+        vm.code[vm.code[vm.pointer + offset] + vm.relative_base_offset]
     else
         error("Unknown mode")
     end
@@ -83,19 +97,19 @@ jmp(vm::VM, pointer::Int) = vm.pointer = pointer
 function evaluate!(vm::VM, op::Op{Add})
     p1 = get_param(vm, 1, op.modes[1])
     p2 = get_param(vm, 2, op.modes[2])
-    set_param(vm, 3, p1 + p2)
+    set_param(vm, 3, op.modes[3], p1 + p2)
     incr(vm, 4)
 end
 
 function evaluate!(vm::VM, op::Op{Multiply})
     p1 = get_param(vm, 1, op.modes[1])
     p2 = get_param(vm, 2, op.modes[2])
-    set_param(vm, 3, p1 * p2)
+    set_param(vm, 3, op.modes[3], p1 * p2)
     incr(vm, 4)
 end
 
 function evaluate!(vm::VM, op::Op{Input})
-    set_param(vm, 1, take!(vm.input))
+    set_param(vm, 1, op.modes[1], take!(vm.input))
     incr(vm, 2)
 end
 
@@ -120,15 +134,21 @@ end
 function evaluate!(vm::VM, op::Op{LessThan})
     p1 = get_param(vm, 1, op.modes[1])
     p2 = get_param(vm, 2, op.modes[2])
-    set_param(vm, 3, p1 < p2 ? 1 : 0)
+    set_param(vm, 3, op.modes[3], p1 < p2 ? 1 : 0)
     incr(vm, 4)
 end
 
 function evaluate!(vm::VM, op::Op{Equals})
     p1 = get_param(vm, 1, op.modes[1])
     p2 = get_param(vm, 2, op.modes[2])
-    set_param(vm, 3, p1 == p2 ? 1 : 0)
+    set_param(vm, 3, op.modes[3], p1 == p2 ? 1 : 0)
     incr(vm, 4)
+end
+
+function evaluate!(vm::VM, op::Op{RelativeBaseOffset})
+    p1 = get_param(vm, 1, op.modes[1])
+    vm.relative_base_offset += p1
+    incr(vm, 2)
 end
 
 function evaluate!(vm::VM, op::Op{Halt})
