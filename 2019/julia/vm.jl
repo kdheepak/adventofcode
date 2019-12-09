@@ -47,10 +47,13 @@ function channel(v)
     foreach(x -> put!(c, x), v)
     return c
 end
-function outputs(c::Channel)
+
+function output(c::Channel)
     close(c)
     return [o for o in c]
 end
+
+input(c::Channel, x) = put!(c, x)
 
 VM(code; input = channel(Int[]), output = channel(Int[]), maxsize = 2^16) = VM(code, input, output, maxsize)
 
@@ -90,11 +93,14 @@ function run!(vm::VM)
         opcode = vm.code[vm.pointer]
         evaluate!(vm, Op(opcode))
     end
-    return vm.output
+    return vm
 end
 
 incr(vm::VM, offset::Int) = vm.pointer += offset
 jmp(vm::VM, pointer::Int) = vm.pointer = pointer
+
+output(vm::VM) = output(vm.output)
+input(vm::VM, value) = input(vm.input, value)
 
 function evaluate!(vm::VM, op::Op{Add})
     p1 = get_param(vm, 1, op.modes[1])
@@ -155,4 +161,12 @@ end
 
 function evaluate!(vm::VM, op::Op{Halt})
     vm.halted = true
+end
+
+if length(ARGS) == 1 && ARGS[1] == "--test-vm"
+    pop!(ARGS)
+    @time include("day02.jl")
+    @time include("day05.jl")
+    @time include("day07.jl")
+    @time include("day09.jl")
 end

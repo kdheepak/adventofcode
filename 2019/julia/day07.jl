@@ -80,7 +80,8 @@ function amplifiers_feedback(data)
         while vmE.halted != true
             sleep(0.0001)
         end
-        maxoutput = max(maxoutput, take!(vmE.output))
+
+        maxoutput = max(maxoutput, output(vmE)[end])
     end
 
     return maxoutput
