@@ -11,11 +11,11 @@ function amplifiers_direct(data)
 
     for phase_setting in permutations([0, 1, 2, 3, 4])
 
-        vmA = VM(copy(data), channel(Int[]), channel(Int[]))
-        vmB = VM(copy(data), vmA.output, channel(Int[]))
-        vmC = VM(copy(data), vmB.output, channel(Int[]))
-        vmD = VM(copy(data), vmC.output, channel(Int[]))
-        vmE = VM(copy(data), vmD.output, channel(Int[]))
+        vmA = VM(copy(data), input = channel(Int[]), output = channel(Int[]), maxsize = length(data))
+        vmB = VM(copy(data), input = vmA.output, output = channel(Int[]), maxsize = length(data))
+        vmC = VM(copy(data), input = vmB.output, output = channel(Int[]), maxsize = length(data))
+        vmD = VM(copy(data), input = vmC.output, output = channel(Int[]), maxsize = length(data))
+        vmE = VM(copy(data), input = vmD.output, output = channel(Int[]), maxsize = length(data))
 
         put!(vmA.input, phase_setting[1])
         put!(vmB.input, phase_setting[2])
@@ -56,11 +56,11 @@ function amplifiers_feedback(data)
 
     for phase_setting in permutations([5, 6, 7, 8, 9])
 
-        vmA = VM(copy(data), channel(Int[]), channel(Int[]))
-        vmB = VM(copy(data), vmA.output, channel(Int[]))
-        vmC = VM(copy(data), vmB.output, channel(Int[]))
-        vmD = VM(copy(data), vmC.output, channel(Int[]))
-        vmE = VM(copy(data), vmD.output, channel(Int[]))
+        vmA = VM(copy(data), input = channel(Int[]), output = channel(Int[]), maxsize = length(data))
+        vmB = VM(copy(data), input = vmA.output, output = channel(Int[]), maxsize = length(data))
+        vmC = VM(copy(data), input = vmB.output, output = channel(Int[]), maxsize = length(data))
+        vmD = VM(copy(data), input = vmC.output, output = channel(Int[]), maxsize = length(data))
+        vmE = VM(copy(data), input = vmD.output, output = channel(Int[]), maxsize = length(data))
         vmA.input = vmE.output
 
         put!(vmA.input, phase_setting[1])

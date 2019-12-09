@@ -52,10 +52,12 @@ function outputs(c::Channel)
     return [o for o in c]
 end
 
-VM(code, input = channel(Int[]), output = channel(Int[])) = VM(OffsetVector(copy(code), 0:(length(code) - 1)), input, output)
+VM(code; input = channel(Int[]), output = channel(Int[]), maxsize = 2^16) = VM(code, input, output, maxsize)
 
-function VM(code::OffsetVector{Int, Vector{Int}}, input = channel(Int[]), output = channel(Int[]), maxsize = 2^16)
-    for _ in 1:maxsize
+VM(code::String, input, output, maxsize) = VM([parse(Int, x) for x in split(strip(data), ",")], input, output, maxsize)
+VM(code::Vector{T}, input, output, maxsize) where T <: Integer = VM(OffsetVector(copy(code), 0:(length(code) - 1)), input, output, maxsize)
+function VM(code::OffsetVector{Int, Vector{Int}}, input, output, maxsize = 2^16)
+    for _ in 1:(maxsize - length(code))
         push!(code, 0)
     end
     return VM(code, 0, false, input, output, 0)
