@@ -11,8 +11,7 @@ function corruption_check(layers)
     minz = Inf
     minl = nothing
     slices = collect(eachslice(layers, dims=3))
-    index = argmin([count(x -> x == 0, l) for l in slices])
-    minl = slices[index]
+    minl = slices[argmin([count(x -> x == 0, l) for l in slices])]
     return count(x -> x == 1, minl) * count(x -> x == 2, minl)
 end
 
