@@ -10,8 +10,7 @@ LAYERS = layers(data, 25, 6)
 function corruption_check(layers)
     minz = Inf
     minl = nothing
-    for il in eachslice(layers, dims=3)
-        l = il'
+    for l in eachslice(layers, dims=3)
         z = count(x -> x == 0, l)
         if min(minz, z) < minz
             minz = min(minz, z)
