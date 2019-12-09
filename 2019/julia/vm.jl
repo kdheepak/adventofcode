@@ -1,36 +1,34 @@
 using CEnum
 using OffsetArrays
 
-@cenum(
-    OpCodes,
-    Add = 1,
-    Multiply = 2,
-    Input = 3,
-    Output = 4,
-    JumpIfTrue = 5,
-    JumpIfFalse = 6,
-    LessThan = 7,
-    Equals = 8,
-    RelativeBaseOffset = 9,
-    Halt = 99,
+abstract type OpCode end
+
+struct ADD <: OpCode end # add
+struct MUL <: OpCode end # multiple
+struct INP <: OpCode end # input
+struct OUT <: OpCode end # output
+struct JNZ <: OpCode end # jump if true
+struct JEZ <: OpCode end # jump if false
+struct OLT <: OpCode end # One if less than
+struct OEQ <: OpCode end # One if equal
+struct ROF <: OpCode end # Relative offset
+struct END <: OpCode end # Halt
+
+OPCODE_LOOKUP = Dict(
+    01 => ADD(),
+    02 => MUL(),
+    03 => INP(),
+    04 => OUT(),
+    05 => JNZ(),
+    06 => JEZ(),
+    07 => OLT(),
+    08 => OEQ(),
+    09 => ROF(),
+    99 => END(),
 )
 
-struct Op{T}
-    modes::Vector{Int}
-end
-
-function Op(opcode)
-    op = OpCodes(opcode % 100)
-    if op ∉ instances(OpCodes)
-        error("Unknown OpCode: $(opcode)")
-    end
-    modes = digits(opcode ÷ 100)
-    while length(modes) < 3
-        push!(modes, 0)
-    end
-    return Op{op}(modes)
-end
-
+opcode(op) = OPCODE_LOOKUP[op % 100]
+modes(opcode) = digits(opcode ÷ 100, pad = 3)
 
 mutable struct VM
     code::OffsetVector{Int, Vector{Int}}
@@ -55,22 +53,32 @@ end
 
 input(c::Channel, x) = put!(c, x)
 
+"""VM Interface function"""
 VM(code; input = channel(Int[]), output = channel(Int[]), maxsize = 2^16) = VM(code, input, output, maxsize)
 
 VM(code::String, input, output, maxsize) = VM([parse(Int, x) for x in split(strip(data), ",")], input, output, maxsize)
 VM(code::Vector{T}, input, output, maxsize) where T <: Integer = VM(OffsetVector(copy(code), 0:(length(code) - 1)), input, output, maxsize)
 function VM(code::OffsetVector{Int, Vector{Int}}, input, output, maxsize = 2^16)
     for _ in 1:(maxsize - length(code))
-        push!(code, 0)
+        push!(code, 0) # initialize memory larger than program to be zero
     end
-    return VM(code, 0, false, input, output, 0)
+    return VM(
+        code, # OffsetVector
+        0, # initial instruction pointer value
+        false, # halt state
+        input, # input channel
+        output, # output channel
+        0, # relative base offset
+    )
 end
 
 function set_param(vm::VM, offset, mode, value)
-    if mode == 2
+    if mode == 2 # relative
         vm.code[vm.code[vm.pointer + offset] + vm.relative_base_offset] = value
-    elseif mode == 0
+    elseif mode == 0 # position
         vm.code[vm.code[vm.pointer + offset]] = value
+    else
+        error("Unknown mode: $mode")
     end
 end
 
@@ -81,17 +89,17 @@ function get_param(vm::VM, offset, mode)
         vm.code[vm.pointer + offset]
     elseif mode == 0 # position
         vm.code[vm.code[vm.pointer + offset]]
-    elseif mode == 2
+    elseif mode == 2 # relative
         vm.code[vm.code[vm.pointer + offset] + vm.relative_base_offset]
     else
-        error("Unknown mode")
+        error("Unknown mode: $mode")
     end
 end
 
 function run!(vm::VM)
     while !vm.halted
-        opcode = vm.code[vm.pointer]
-        evaluate!(vm, Op(opcode))
+        op = vm.code[vm.pointer]
+        evaluate!(vm, opcode(op), modes(op))
     end
     return vm
 end
@@ -102,64 +110,64 @@ jmp(vm::VM, pointer::Int) = vm.pointer = pointer
 output(vm::VM) = output(vm.output)
 input(vm::VM, value) = input(vm.input, value)
 
-function evaluate!(vm::VM, op::Op{Add})
-    p1 = get_param(vm, 1, op.modes[1])
-    p2 = get_param(vm, 2, op.modes[2])
-    set_param(vm, 3, op.modes[3], p1 + p2)
+function evaluate!(vm::VM, op::ADD, modes)
+    p1 = get_param(vm, 1, modes[1])
+    p2 = get_param(vm, 2, modes[2])
+    set_param(vm, 3, modes[3], p1 + p2)
     incr(vm, 4)
 end
 
-function evaluate!(vm::VM, op::Op{Multiply})
-    p1 = get_param(vm, 1, op.modes[1])
-    p2 = get_param(vm, 2, op.modes[2])
-    set_param(vm, 3, op.modes[3], p1 * p2)
+function evaluate!(vm::VM, op::MUL, modes)
+    p1 = get_param(vm, 1, modes[1])
+    p2 = get_param(vm, 2, modes[2])
+    set_param(vm, 3, modes[3], p1 * p2)
     incr(vm, 4)
 end
 
-function evaluate!(vm::VM, op::Op{Input})
-    set_param(vm, 1, op.modes[1], take!(vm.input))
+function evaluate!(vm::VM, op::INP, modes)
+    set_param(vm, 1, modes[1], take!(vm.input))
     incr(vm, 2)
 end
 
-function evaluate!(vm::VM, op::Op{Output})
-    p1 = get_param(vm, 1, op.modes[1])
+function evaluate!(vm::VM, op::OUT, modes)
+    p1 = get_param(vm, 1, modes[1])
     put!(vm.output, p1)
     incr(vm, 2)
 end
 
-function evaluate!(vm::VM, op::Op{JumpIfTrue})
-    p1 = get_param(vm, 1, op.modes[1])
-    p2 = get_param(vm, 2, op.modes[2])
+function evaluate!(vm::VM, op::JNZ, modes)
+    p1 = get_param(vm, 1, modes[1])
+    p2 = get_param(vm, 2, modes[2])
     p1 != 0 ? jmp(vm, p2) : incr(vm, 3)
 end
 
-function evaluate!(vm::VM, op::Op{JumpIfFalse})
-    p1 = get_param(vm, 1, op.modes[1])
-    p2 = get_param(vm, 2, op.modes[2])
+function evaluate!(vm::VM, op::JEZ, modes)
+    p1 = get_param(vm, 1, modes[1])
+    p2 = get_param(vm, 2, modes[2])
     p1 == 0 ? jmp(vm, p2) : incr(vm, 3)
 end
 
-function evaluate!(vm::VM, op::Op{LessThan})
-    p1 = get_param(vm, 1, op.modes[1])
-    p2 = get_param(vm, 2, op.modes[2])
-    set_param(vm, 3, op.modes[3], p1 < p2 ? 1 : 0)
+function evaluate!(vm::VM, op::OLT, modes)
+    p1 = get_param(vm, 1, modes[1])
+    p2 = get_param(vm, 2, modes[2])
+    set_param(vm, 3, modes[3], p1 < p2 ? 1 : 0)
     incr(vm, 4)
 end
 
-function evaluate!(vm::VM, op::Op{Equals})
-    p1 = get_param(vm, 1, op.modes[1])
-    p2 = get_param(vm, 2, op.modes[2])
-    set_param(vm, 3, op.modes[3], p1 == p2 ? 1 : 0)
+function evaluate!(vm::VM, op::OEQ, modes)
+    p1 = get_param(vm, 1, modes[1])
+    p2 = get_param(vm, 2, modes[2])
+    set_param(vm, 3, modes[3], p1 == p2 ? 1 : 0)
     incr(vm, 4)
 end
 
-function evaluate!(vm::VM, op::Op{RelativeBaseOffset})
-    p1 = get_param(vm, 1, op.modes[1])
+function evaluate!(vm::VM, op::ROF, modes)
+    p1 = get_param(vm, 1, modes[1])
     vm.relative_base_offset += p1
     incr(vm, 2)
 end
 
-function evaluate!(vm::VM, op::Op{Halt})
+function evaluate!(vm::VM, op::END, modes)
     vm.halted = true
 end
 
