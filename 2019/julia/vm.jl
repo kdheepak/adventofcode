@@ -163,7 +163,7 @@ function evaluate!(vm::VM, op::Op{Halt})
     vm.halted = true
 end
 
-if length(ARGS) == 1 && ARGS[1] == "--test-vm"
+if length(ARGS) == 1 && ARGS[1] == "--test-intcode-vm"
     pop!(ARGS)
     @time include("day02.jl")
     @time include("day05.jl")
