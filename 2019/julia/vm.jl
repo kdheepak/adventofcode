@@ -28,7 +28,7 @@ OPCODE_LOOKUP = Dict(
 )
 
 opcode(op) = OPCODE_LOOKUP[op % 100]
-modes(opcode) = digits(opcode ÷ 100, pad = 3)
+modes(op) = op ÷ 100 % 10, op ÷ 1000 % 10, op ÷ 10000 % 10
 
 mutable struct VM
     code::OffsetVector{Int, Vector{Int}}
@@ -97,9 +97,11 @@ function get_param(vm::VM, offset, mode)
 end
 
 function run!(vm::VM)
+    m = zeros(Int, 3)
     while !vm.halted
         op = vm.code[vm.pointer]
-        evaluate!(vm, opcode(op), modes(op))
+        m[1], m[2], m[3] = modes(op)
+        evaluate!(vm, opcode(op), m)
     end
     return vm
 end

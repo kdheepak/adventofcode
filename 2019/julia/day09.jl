@@ -22,6 +22,11 @@ vm = VM(data, input = channel(Int[1]))
 run!(vm)
 @assert output(vm) == [3335138414]
 
+
+@time begin
+
 vm = VM(data, input = channel(Int[2]))
 run!(vm)
 @assert output(vm) == [49122]
+
+end
