@@ -26,12 +26,12 @@ end
 
 @assert corruption_check(LAYERS) == 828
 
-collapse(layer1::Matrix{Int}, layer2::Matrix{Int}) = reshape([collapse(p1, p2) for (p1, p2) in zip(layer1, layer2)], size(layer1)...)
-collapse(pixel1::Int, pixel2::Int) = (pixel1 == 0 || pixel1 == 1) ? pixel1 : (pixel2 == 0 || pixel2 == 1) ? pixel2 : 2
+merge(layer1::Matrix{Int}, layer2::Matrix{Int}) = reshape([merge(p1, p2) for (p1, p2) in zip(layer1, layer2)], size(layer1)...)
+merge(pixel1::Int, pixel2::Int) = pixel1 == 2 ? pixel2 : pixel1
 
 function draw(image, )
     io = IOBuffer()
-    result = foldl(collapse, [image[:, :, z] for z in 1:size(image)[3]])'
+    result = foldl(merge, [image[:, :, z] for z in 1:size(image)[3]])'
     rows, cols = size(result)
     for row in 1:rows, col in 1:cols
         c = result[row, col]
