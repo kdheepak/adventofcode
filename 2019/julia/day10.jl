@@ -2,12 +2,6 @@ using OffsetArrays
 
 data = read(joinpath(@__DIR__, "./../data/day10.txt"), String)
 
-function count_asteroids(data, x, y)
-    data[x, y] != 1 && return 0
-    line_of_sight = get_line_of_sight(data, x, y)
-    return length(line_of_sight)
-end
-
 function distance(a1, a2)
     x1, y1 = a1
     x2, y2 = a2
@@ -17,16 +11,14 @@ end
 function get_line_of_sight(data, x, y)
     line_of_sight = Dict{ComplexF64, Tuple{Int, Int}}()
     rows, cols = size(data)
-    for c in 0:cols-1
-        for r in 0:rows-1
-            if x == c && y == r
-                continue
-            elseif data[c, r] == 1
-                z = (x - c) + (y - r)*im
-                z = round(z / abs(z), digits=4)
-                if z ∉ keys(line_of_sight) || distance((c,r), (x, y)) < distance(line_of_sight[z], (x, y))
-                    line_of_sight[z] = (c, r)
-                end
+    for c in 0:cols-1, r in 0:rows-1
+        if x == c && y == r
+            continue
+        elseif data[c, r] == '#'
+            z = (x - c) + (y - r)*im
+            z = round(z / abs(z), digits=4)
+            if z ∉ keys(line_of_sight) || distance((c,r), (x, y)) < distance(line_of_sight[z], (x, y))
+                line_of_sight[z] = (c, r)
             end
         end
     end
@@ -34,23 +26,21 @@ function get_line_of_sight(data, x, y)
 end
 
 function parse_asteroid_map(data::AbstractString)
-    data = reshape([
-        x == '#' ? 1 : 0
-        for x in data if x != '\n'
-        ],
+    data = reshape(
+        [x for x in data if x != '\n'],
         length(split(data)),
         length(split(data)[1]),
     )
     return OffsetArray(data, -1, -1)
 end
 
-
 function count_asteroids(data)
     data = parse_asteroid_map(data)
     max_asteroids = 0
     px = py = 0
     for x in 0:(size(data)[1]-1), y in 0:(size(data)[2]-1)
-        c = count_asteroids(data, x, y)
+        data[x, y] != '#' && continue
+        c = length(get_line_of_sight(data, x, y))
         if c > max_asteroids
             max_asteroids = c
             px, py = x, y
