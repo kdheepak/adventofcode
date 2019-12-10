@@ -15,15 +15,15 @@ end
 function get_line_of_sight(data, x, y)
     line_of_sight = Dict{ComplexF64, Tuple{Int, Int}}()
     rows, cols = size(data)
-    for j in 1:cols
-        for i in 1:rows
-            if x == i && y == j
+    for c in 1:cols
+        for r in 1:rows
+            if x == c && y == r
                 continue
-            elseif data[i, j] == 1
-                z = (x - i) + (y - j)*im
+            elseif data[c, r] == 1
+                z = (x - c) + (y - r)*im
                 z = round(z / abs(z), digits=4)
-                if z ∉ keys(line_of_sight) || distance((i,j), (x, y)) < distance(line_of_sight[z], (x, y))
-                    line_of_sight[z] = (i, j)
+                if z ∉ keys(line_of_sight) || distance((c,r), (x, y)) < distance(line_of_sight[z], (x, y))
+                    line_of_sight[z] = (c, r)
                 end
             end
         end
@@ -38,7 +38,7 @@ function g(data::AbstractString)
         ],
         length(split(data)),
         length(split(data)[1]),
-    )'
+    )
     return data
 end
 
@@ -54,7 +54,7 @@ function f(data)
             px, py = x, y
         end
     end
-    return max_asteroids, (py-1, px-1)
+    return max_asteroids, (px-1, py-1)
 end
 
 tdata = """
@@ -139,3 +139,35 @@ tdata = """
 @assert f(tdata) == (210, (11, 13))
 
 @assert f(data) == (260, (14, 17))
+
+function sort_by_angles(z)
+    angle = atand(z.re, z.im)
+    if angle < 0
+        angle += 360
+    end
+    return angle
+end
+
+
+tdata = g(tdata)
+los = get_line_of_sight(tdata, 11+1, 13+1)
+sorted_keys = sort([k for k in keys(los)], by = sort_by_angles)
+
+@assert los[sorted_keys[1]] == (11 + 1, 12 + 1)
+@assert los[sorted_keys[end]] == (12 + 1, 1 + 1)
+@assert los[sorted_keys[end-1]] == (12 + 1, 2 + 1)
+@assert los[sorted_keys[end-8]] == (12 + 1, 8 + 1)
+@assert los[sorted_keys[end-18]] == (16 + 1, 0 + 1)
+@assert los[sorted_keys[end-48]] == (16 + 1, 9 + 1)
+@assert los[sorted_keys[end-98]] == (10 + 1, 16 + 1)
+@assert los[sorted_keys[end-197]] == (9 + 1, 6 + 1)
+@assert los[sorted_keys[end-198]] == (8 + 1, 2 + 1)
+@assert los[sorted_keys[end-199]] == (10 + 1, 9 + 1)
+
+
+data = g(data)
+los = get_line_of_sight(data, 14+1, 17+1)
+sorted_keys = sort([k for k in keys(los)], by = sort_by_angles)
+
+x, y = los[sorted_keys[end-198]]
+(x-1)*100 + (y-1)
