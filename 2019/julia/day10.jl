@@ -1,3 +1,5 @@
+using OffsetArrays
+
 data = read(joinpath(@__DIR__, "./../data/day10.txt"), String)
 
 function count_asteroids(data, x, y)
@@ -15,8 +17,8 @@ end
 function get_line_of_sight(data, x, y)
     line_of_sight = Dict{ComplexF64, Tuple{Int, Int}}()
     rows, cols = size(data)
-    for c in 1:cols
-        for r in 1:rows
+    for c in 0:cols-1
+        for r in 0:rows-1
             if x == c && y == r
                 continue
             elseif data[c, r] == 1
@@ -31,7 +33,7 @@ function get_line_of_sight(data, x, y)
     return line_of_sight
 end
 
-function g(data::AbstractString)
+function parse_asteroid_map(data::AbstractString)
     data = reshape([
         x == '#' ? 1 : 0
         for x in data if x != '\n'
@@ -39,22 +41,22 @@ function g(data::AbstractString)
         length(split(data)),
         length(split(data)[1]),
     )
-    return data
+    return OffsetArray(data, -1, -1)
 end
 
 
-function f(data)
-    data = g(data)
+function count_asteroids(data)
+    data = parse_asteroid_map(data)
     max_asteroids = 0
     px = py = 0
-    for x in 1:size(data)[1], y in 1:size(data)[2]
+    for x in 0:(size(data)[1]-1), y in 0:(size(data)[2]-1)
         c = count_asteroids(data, x, y)
         if c > max_asteroids
             max_asteroids = c
             px, py = x, y
         end
     end
-    return max_asteroids, (px-1, py-1)
+    return max_asteroids, (px, py)
 end
 
 tdata = """
@@ -65,7 +67,7 @@ tdata = """
 ...##
 """ |> strip
 
-@assert f(tdata) == (8, (3, 4))
+@assert count_asteroids(tdata) == (8, (3, 4))
 
 tdata = """
 ......#.#.
@@ -80,7 +82,7 @@ tdata = """
 .#....####
 """
 
-@assert f(tdata) == (33, (5, 8))
+@assert count_asteroids(tdata) == (33, (5, 8))
 
 
 tdata = """
@@ -96,7 +98,7 @@ tdata = """
 .####.###.
 """
 
-@assert f(tdata) == (35, (1, 2))
+@assert count_asteroids(tdata) == (35, (1, 2))
 
 tdata = """
 .#..#..###
@@ -111,7 +113,7 @@ tdata = """
 .....#.#..
 """
 
-@assert f(tdata) == (41, (6, 3))
+@assert count_asteroids(tdata) == (41, (6, 3))
 
 tdata = """
 .#..##.###...#######
@@ -136,9 +138,9 @@ tdata = """
 ###.##.####.##.#..##
 """
 
-@assert f(tdata) == (210, (11, 13))
+@assert count_asteroids(tdata) == (210, (11, 13))
 
-@assert f(data) == (260, (14, 17))
+@assert count_asteroids(data) == (260, (14, 17))
 
 function sort_by_angles(z)
     angle = atand(z.re, z.im)
@@ -148,26 +150,28 @@ function sort_by_angles(z)
     return angle
 end
 
+function find_asteroid_vaporization_order(data, x, y)
+    data = parse_asteroid_map(data)
+    los = get_line_of_sight(data, x, y)
+    sorted_keys = reverse(sort([k for k in keys(los)], by = sort_by_angles))
+    if sorted_keys[end] == 0.0 + 1.0im
+        pushfirst!(sorted_keys, pop!(sorted_keys))
+    end
+    return los, sorted_keys
+end
+line_of_sight, sorted_keys = find_asteroid_vaporization_order(tdata, 11, 13)
 
-tdata = g(tdata)
-los = get_line_of_sight(tdata, 11+1, 13+1)
-sorted_keys = sort([k for k in keys(los)], by = sort_by_angles)
+@assert line_of_sight[sorted_keys[1]] == (11, 12)
+@assert line_of_sight[sorted_keys[2]] == (12, 1)
+@assert line_of_sight[sorted_keys[3]] == (12, 2)
+@assert line_of_sight[sorted_keys[10]] == (12, 8)
+@assert line_of_sight[sorted_keys[20]] == (16, 0)
+@assert line_of_sight[sorted_keys[50]] == (16, 9)
+@assert line_of_sight[sorted_keys[100]] == (10, 16)
+@assert line_of_sight[sorted_keys[199]] == (9, 6)
+@assert line_of_sight[sorted_keys[200]] == (8, 2)
+@assert line_of_sight[sorted_keys[201]] == (10, 9)
 
-@assert los[sorted_keys[1]] == (11 + 1, 12 + 1)
-@assert los[sorted_keys[end]] == (12 + 1, 1 + 1)
-@assert los[sorted_keys[end-1]] == (12 + 1, 2 + 1)
-@assert los[sorted_keys[end-8]] == (12 + 1, 8 + 1)
-@assert los[sorted_keys[end-18]] == (16 + 1, 0 + 1)
-@assert los[sorted_keys[end-48]] == (16 + 1, 9 + 1)
-@assert los[sorted_keys[end-98]] == (10 + 1, 16 + 1)
-@assert los[sorted_keys[end-197]] == (9 + 1, 6 + 1)
-@assert los[sorted_keys[end-198]] == (8 + 1, 2 + 1)
-@assert los[sorted_keys[end-199]] == (10 + 1, 9 + 1)
-
-
-data = g(data)
-los = get_line_of_sight(data, 14+1, 17+1)
-sorted_keys = sort([k for k in keys(los)], by = sort_by_angles)
-
-x, y = los[sorted_keys[end-198]]
-(x-1)*100 + (y-1)
+line_of_sight, sorted_keys = find_asteroid_vaporization_order(data, 14, 17)
+x, y = line_of_sight[sorted_keys[200]]
+@assert (x)*100 + (y) == 608
