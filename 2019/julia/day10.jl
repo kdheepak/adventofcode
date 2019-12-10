@@ -15,7 +15,7 @@ function get_line_of_sight(data, x, y)
         if x == c && y == r
             continue
         elseif data[c, r] == '#'
-            z = (x - c) + (y - r)*im
+            z = -1(x - c) + (y - r)*im
             z = round(z / abs(z), digits=4)
             if z ∉ keys(line_of_sight) || distance((c,r), (x, y)) < distance(line_of_sight[z], (x, y))
                 line_of_sight[z] = (c, r)
@@ -133,7 +133,7 @@ tdata = """
 @assert count_asteroids(data) == (260, (14, 17))
 
 function sort_by_angles(z)
-    angle = atand(z.re, z.im)
+    angle = atand(real(z), imag(z))
     if angle < 0
         angle += 360
     end
@@ -143,10 +143,7 @@ end
 function find_asteroid_vaporization_order(data, x, y)
     data = parse_asteroid_map(data)
     los = get_line_of_sight(data, x, y)
-    sorted_keys = reverse(sort([k for k in keys(los)], by = sort_by_angles))
-    if sorted_keys[end] == 0.0 + 1.0im
-        pushfirst!(sorted_keys, pop!(sorted_keys))
-    end
+    sorted_keys = sort([k for k in keys(los)], by = sort_by_angles)
     return los, sorted_keys
 end
 line_of_sight, sorted_keys = find_asteroid_vaporization_order(tdata, 11, 13)
@@ -161,6 +158,22 @@ line_of_sight, sorted_keys = find_asteroid_vaporization_order(tdata, 11, 13)
 @assert line_of_sight[sorted_keys[199]] == (9, 6)
 @assert line_of_sight[sorted_keys[200]] == (8, 2)
 @assert line_of_sight[sorted_keys[201]] == (10, 9)
+
+map_tdata = parse_asteroid_map(tdata)
+last_line_of_sight = nothing
+while count(map_tdata .== '#') != 1
+    global sorted_keys, line_of_sight, map_tdata, last_line_of_sight
+    tsk = sort([k for k in keys(line_of_sight)], by = sort_by_angles)
+    for k in tsk
+        map_tdata[line_of_sight[k]...] = '.'
+    end
+    last_line_of_sight = line_of_sight
+    line_of_sight = get_line_of_sight(map_tdata, 11, 13)
+    tsk = sort([k for k in keys(line_of_sight)], by = sort_by_angles)
+    sorted_keys = vcat(sorted_keys, tsk)
+end
+
+@assert last_line_of_sight[sorted_keys[299]] == (11, 1)
 
 line_of_sight, sorted_keys = find_asteroid_vaporization_order(data, 14, 17)
 x, y = line_of_sight[sorted_keys[200]]
