@@ -4,7 +4,7 @@ data = read(joinpath(@__DIR__, "../data/day11.txt"), String)
 
 include("vm.jl")
 
-function part1(start_panel_color = 0)
+function get_panels(start_panel_color = 0)
     inp = Channel{Int}(1)
     out = Channel{Int}(1)
     vm = VM(data, input = inp, output = out)
@@ -24,11 +24,11 @@ function part1(start_panel_color = 0)
     return panels
 end
 
-panels = part1()
+panels = get_panels()
 @assert length(panels) == 1771
 
-function part2()
-    panels = part1(1)
+function get_image()
+    panels = get_panels(1)
     minx, maxx = extrema(real.(keys(panels)))
     miny, maxy = extrema(imag.(keys(panels)))
     io = IOBuffer()
@@ -41,7 +41,7 @@ function part2()
     String(take!(io))
 end
 
-@assert split(strip(part2())) == split(strip("""
+@assert split(strip(get_image())) == split(strip("""
   █  █  ██  ████ █  █   ██ █  █ █  █ ████
   █  █ █  █ █    █  █    █ █  █ █  █    █
   ████ █    ███  ████    █ ████ █  █   █
