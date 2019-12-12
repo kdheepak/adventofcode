@@ -15,7 +15,7 @@ tdata2 = """
 """ |> strip
 
 get_positions(data) = [parse.(Int, p.captures) for p in match.(r"x=(-?\d+), y=(-?\d+), z=(-?\d+)", split(strip(data), "\n"))]
-calculate_velocity(p1, p2) = p1 < p2 ? 1 : p1 > p2 ? -1 : 0
+calculate_velocity(p1, p2) = sign(p2 - p1)
 
 function simulate_step(positions, velocities)
     for i in 1:length(positions), j in i+1:length(positions)
