@@ -29,16 +29,13 @@ part1(data = readInput()) = calculate_energy(data, 1000)
 
 function find_cycle(d_position)
     d_velocity = zeros(Int, length(d_position))
-    states = Dict{UInt64, Int}()
+    states = Set{UInt64}()
     counter = 0
     while true
-        tick(d_position, d_velocity)
         state = hash(hcat(d_position..., d_velocity...))
-        if state ∈ keys(states)
-            break
-        end
-        states[state] = counter
+        state ∈ states ? break : push!(states, state)
         counter += 1
+        tick(d_position, d_velocity)
     end
     return counter
 end
@@ -72,7 +69,7 @@ function runtests()
         @test calculate_energy(tdata1, 10) == 179
         @test calculate_energy(tdata2, 100) == 1940
         @test part1() == 5350
-    end
+    end;
     @testset "Day 12: Part 2" begin
         @test find_cycle_of_universe(tdata1) == 2772
         @test find_cycle_of_universe(tdata2) == 4686774924
