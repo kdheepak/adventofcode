@@ -1,6 +1,6 @@
 module aoc # See https://github.com/gsoleilhac/aoc19.jl
 
-using Dates, BenchmarkTools, DataFrames, REPL
+using Dates, BenchmarkTools, DataFrames, REPL, Literate
 
 export part1, part2
 
@@ -37,6 +37,16 @@ function benchmarkAll()
         push!(df, formatTime.((t1, t2)))
     end
     df
+end
+
+function generate_readme(;day::Int)
+    dstr = "day$(lpad(day, 2, "0"))"
+    Literate.markdown(
+        "src/$dstr/$dstr.jl",
+        "./src/$dstr/";
+        config=Dict("name"=>"README"),
+        documenter=false
+    )
 end
 
 end # module
