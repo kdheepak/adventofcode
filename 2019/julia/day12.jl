@@ -41,7 +41,7 @@ end
 @assert calculate_energy(tdata2, 100) == 1940
 @assert calculate_energy(data, 1000) == 5350
 
-function cycle(d_position)
+function find_cycle(d_position)
     d_velocity = zeros(Int, length(d_position))
     states = Dict{UInt64, Int}()
     counter = 0
@@ -64,9 +64,9 @@ end
 
 function find_cycle_of_universe(data)
     initial_positions = get_positions(data)
-    x = cycle([p[1] for p in initial_positions])
-    y = cycle([p[2] for p in initial_positions])
-    z = cycle([p[3] for p in initial_positions])
+    x = find_cycle([p[1] for p in initial_positions])
+    y = find_cycle([p[2] for p in initial_positions])
+    z = find_cycle([p[3] for p in initial_positions])
     return lcm(x, y, z)
 end
 
