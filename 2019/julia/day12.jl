@@ -14,26 +14,16 @@ tdata2 = """
 <x=9, y=-8, z=-3>
 """ |> strip
 
-function get_positions(data)
-    data = split(strip(data), "\n")
-    positions = [parse.(Int, p.captures) for p in match.(r"x=(-?\d+), y=(-?\d+), z=(-?\d+)", data)]
-    return positions
-end
-
+get_positions(data) = [parse.(Int, p.captures) for p in match.(r"x=(-?\d+), y=(-?\d+), z=(-?\d+)", split(strip(data), "\n"))]
 calculate_velocity(p1, p2) = p1 < p2 ? 1 : p1 > p2 ? -1 : 0
 
 function simulate_step(positions, velocities)
-    t = zeros(Int, length(positions[1]))
-    for i in 1:length(positions)
-        for j in i+1:length(positions)
-            t[1], t[2], t[3] = calculate_velocity.(positions[i], positions[j])
-            velocities[i] += t
-            velocities[j] -= t
-        end
+    for i in 1:length(positions), j in i+1:length(positions)
+        v = calculate_velocity.(positions[i], positions[j])
+        velocities[i] += v
+        velocities[j] -= v
     end
-    for k in 1:length(positions)
-        positions[k] += velocities[k]
-    end
+    positions .+= velocities
 end
 
 function calculate_energy(data, steps)
@@ -53,27 +43,23 @@ end
 
 function cycle(d_position)
     d_velocity = zeros(Int, length(d_position))
-    states = Dict()
+    states = Dict{UInt64, Int}()
     counter = 0
     while true
-        for i in 1:length(d_position)
-            for j in i+1:length(d_position)
-                d = calculate_velocity(d_position[i], d_position[j])
-                d_velocity[i] += d
-                d_velocity[j] -= d
-            end
+        for i in 1:length(d_position), j in i+1:length(d_position)
+            d_v = calculate_velocity(d_position[i], d_position[j])
+            d_velocity[i] += d_v
+            d_velocity[j] -= d_v
         end
-        for k in 1:length(d_position)
-            d_position[k] += d_velocity[k]
-        end
+        d_position .+= d_velocity
         state = hash(hcat(d_velocity..., d_position...))
-        if state in keys(states)
-            return counter - states[state]
+        if state ∈ keys(states)
+            break
         end
         states[state] = counter
         counter += 1
     end
-    return counter
+    return counter - states[hash(hcat(d_velocity..., d_position...))]
 end
 
 function find_cycle_of_universe(data)
