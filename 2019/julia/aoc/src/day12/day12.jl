@@ -5,16 +5,20 @@ readInput() = read(joinpath(@__DIR__, "./input.txt"), String)
 get_positions(data) = [parse.(Int, p.captures) for p in match.(r"x=(-?\d+), y=(-?\d+), z=(-?\d+)", split(strip(data), "\n"))]
 calculate_velocity(p1, p2) = sign(p2 - p1)
 
+function tick(positions, velocities)
+    for i in 1:length(positions), j in i+1:length(positions)
+        v = calculate_velocity.(positions[i], positions[j])
+        velocities[i] += v
+        velocities[j] -= v
+    end
+    positions .+= velocities
+end
+
 function calculate_energy(data, steps)
     positions = get_positions(data)
     velocities = [zeros(Int, 3) for _ in positions]
     for _ in 1:steps
-        for i in 1:length(positions), j in i+1:length(positions)
-            v = calculate_velocity.(positions[i], positions[j])
-            velocities[i] += v
-            velocities[j] -= v
-        end
-        positions .+= velocities
+        tick(positions, velocities)
     end
     pot = [sum(abs.(p)) for p in positions]
     kin = [sum(abs.(v)) for v in velocities]
@@ -28,20 +32,15 @@ function find_cycle(d_position)
     states = Dict{UInt64, Int}()
     counter = 0
     while true
-        for i in 1:length(d_position), j in i+1:length(d_position)
-            d_v = calculate_velocity(d_position[i], d_position[j])
-            d_velocity[i] += d_v
-            d_velocity[j] -= d_v
-        end
-        d_position .+= d_velocity
-        state = hash(hcat(d_velocity..., d_position...))
+        tick(d_position, d_velocity)
+        state = hash(hcat(d_position..., d_velocity...))
         if state ∈ keys(states)
             break
         end
         states[state] = counter
         counter += 1
     end
-    return counter - states[hash(hcat(d_velocity..., d_position...))]
+    return counter
 end
 
 function find_cycle_of_universe(data)

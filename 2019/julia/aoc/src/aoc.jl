@@ -4,12 +4,12 @@ using Dates, BenchmarkTools, DataFrames, REPL
 
 export part1, part2
 
-for day = 1:25
-    ds = "day$(lpad(day, 2, "0"))"
-    d = Symbol(ds)
+for d in 1:25
+    dstr = "day$(lpad(d, 2, "0"))"
+    dsym = Symbol(dstr)
     eval(:(
-        module $d
-            include($ds * "/" * $ds * ".jl")
+        module $dsym
+            include($dstr * "/" * $dstr * ".jl")
         end
     ))
 end
@@ -27,7 +27,7 @@ function benchmark(day::Int = min(Dates.day(Dates.today()), 25))
     return t1, t2
 end
 
-formatTime(t) = (1e9 * t) |> BenchmarkTools.prettytime
+formatTime(t) = BenchmarkTools.prettytime(1e9 * t)
 
 function benchmarkAll()
     df = DataFrame(part1 = String[], part2 = String[])
