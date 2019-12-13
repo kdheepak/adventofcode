@@ -64,7 +64,7 @@ function part2(data = readInput())
         else
             put!(vm.input, 0)
         end
-        yield()
+        wait(vm.output)
     end
     while Base.n_avail(vm.output) > 0
         x = take!(vm.output)
