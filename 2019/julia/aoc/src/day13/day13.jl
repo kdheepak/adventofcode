@@ -36,7 +36,7 @@ end
 function part2(data = readInput())
     data = [parse(Int, x) for x in split(strip(data), ",")]
     data[1] = 2
-    vm = VM(data, input = Channel{Int}(10))
+    vm = VM(data, input = Channel{Int}())
     @async run!(vm)
     game = DefaultDict{Tuple{Int, Int}, Int}(0)
     score = 0
@@ -66,7 +66,7 @@ function part2(data = readInput())
             else
                 put!(vm.input, 0)
             end
-            sleep(0.0001)
+            # sleep(0.0001)
         end
     end
     while Base.n_avail(vm.output) > 0
