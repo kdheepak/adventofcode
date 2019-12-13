@@ -36,38 +36,35 @@ end
 function part2(data = readInput())
     data = [parse(Int, x) for x in split(strip(data), ",")]
     data[1] = 2
-    vm = VM(data, input = Channel{Int}())
+    vm = VM(data)
     @async run!(vm)
     game = DefaultDict{Tuple{Int, Int}, Int}(0)
     score = 0
     ball = -1, -1
     paddle = -1, -1
     while !vm.halted
-        if Base.n_avail(vm.output) > 0
-            while Base.n_avail(vm.output) > 0
-                x = take!(vm.output)
-                y = take!(vm.output)
-                tile = take!(vm.output)
-                if x == -1 && y == 0
-                    score = tile
-                elseif tile == 4
-                    ball = (x, y)
-                elseif tile == 3
-                    paddle = (x, y)
-                else
-                end
-                game[(x, y)] = tile
-            end
-        else
-            if ball[1] > paddle[1]
-                put!(vm.input, 1)
-            elseif ball[1] < paddle[1]
-                put!(vm.input, -1)
+        while Base.n_avail(vm.output) > 0
+            x = take!(vm.output)
+            y = take!(vm.output)
+            tile = take!(vm.output)
+            if x == -1 && y == 0
+                score = tile
+            elseif tile == 4
+                ball = (x, y)
+            elseif tile == 3
+                paddle = (x, y)
             else
-                put!(vm.input, 0)
             end
-            # sleep(0.0001)
+            game[(x, y)] = tile
         end
+        if ball[1] > paddle[1]
+            put!(vm.input, 1)
+        elseif ball[1] < paddle[1]
+            put!(vm.input, -1)
+        else
+            put!(vm.input, 0)
+        end
+        yield()
     end
     while Base.n_avail(vm.output) > 0
         x = take!(vm.output)
@@ -75,13 +72,22 @@ function part2(data = readInput())
         tile = take!(vm.output)
         if x == -1 && y == 0
             score = tile
-        elseif tile == 4
-            ball = (x, y)
-        elseif tile == 3
-            paddle = (x, y)
-        else
         end
         game[(x, y)] = tile
     end
     return score
+end
+
+# ### Tests
+
+using Test
+
+function runtests()
+    @testset "Day 13: Part 1" begin
+        @test part1() == 230
+    end
+
+    @testset "Day 13: Part 2" begin
+        @test part2() == 11140
+    end
 end
