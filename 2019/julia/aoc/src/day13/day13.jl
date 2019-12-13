@@ -47,6 +47,7 @@ function part2(data = readInput())
             put!(vm.input, 0)
         end
         wait(vm.output)
+        draw(game, score)
     end
     while Base.n_avail(vm.output) > 0
         x = take!(vm.output)
@@ -73,7 +74,7 @@ function draw(game, score)
             if game[(x,y)] == 4
                 print("O")
             elseif game[(x,y)] == 3
-                print("█")
+                print("_")
             elseif game[(x,y)] == 0
                 print(" ")
             else
@@ -82,7 +83,6 @@ function draw(game, score)
         end
         println()
     end
-    print("$(Terminals.CSI)?12l$(Terminals.CSI)?25l")
 end
 
 function read_character()
@@ -108,19 +108,7 @@ function play(data = readInput())
     cc = [c for c in new_term.c_cc]
     new_term.c_cc = tuple(cc...)
     T.tcsetattr(stdin, T.TCSANOW, new_term)
-    @async while true
-        c = String(read(stdin, 1))
-        if c == "l"
-            put!(vm.input, 1)
-        elseif c == "h"
-            put!(vm.input, -1)
-        elseif c == "q"
-            break
-        else
-            put!(vm.input, 0)
-        end
-        yield()
-    end
+    print("$(Terminals.CSI)?12l$(Terminals.CSI)?25l")
     while !vm.halted
         wait(vm.output)
         while Base.n_avail(vm.output) > 0
@@ -138,6 +126,16 @@ function play(data = readInput())
             game[(x, y)] = tile
         end
         draw(game, score)
+        c = String(read(stdin, 1))
+        if c == "l"
+            put!(vm.input, 1)
+        elseif c == "h"
+            put!(vm.input, -1)
+        elseif c == "q"
+            break
+        else
+            put!(vm.input, 0)
+        end
     end
     while Base.n_avail(vm.output) > 0
         x = take!(vm.output)
@@ -152,6 +150,8 @@ function play(data = readInput())
     print("$(Terminals.CSI)?12l$(Terminals.CSI)?25l")
     return score
 end
+
+const solve = part2
 
 # ### Tests
 
