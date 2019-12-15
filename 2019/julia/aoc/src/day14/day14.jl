@@ -160,7 +160,7 @@ function runtests()
         @test part2(test_data3) == 82892753
         @test part2(test_data4) == 5586022
         @test part2(test_data5) == 460664
-        @test part2() == 4215653
+        @test part2() == 4215654
     end
 
 end
