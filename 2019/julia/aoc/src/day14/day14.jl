@@ -79,30 +79,33 @@ struct Chemical
     quantity::Int
 end
 
+function parseData(data = readInput())
 
-reaction_formula = Dict{String, Vector{Chemical}}()
-reaction_quantity = Dict{String, Int}()
+    reaction_formula = Dict{String, Vector{Chemical}}()
+    reaction_quantity = Dict{String, Int}()
 
-for line in split(strip(data), "\n")
-    lhs, rhs = split(line, "=>")
-    ingredients = Chemical[]
-    for item in split(strip(lhs), ",")
-        q, v = split(strip(item), " ")
+    for line in split(strip(data), "\n")
+        lhs, rhs = split(line, "=>")
+        ingredients = Chemical[]
+        for item in split(strip(lhs), ",")
+            q, v = split(strip(item), " ")
+            q = parse(Int, q)
+            v = String(v)
+            push!(ingredients, Chemical(v, q))
+        end
+        q, v = split(strip(rhs), " ")
         q = parse(Int, q)
         v = String(v)
-        push!(ingredients, Chemical(v, q))
+        reaction_formula[v] = ingredients
+        reaction_quantity[v] = q
     end
-    q, v = split(strip(rhs), " ")
-    q = parse(Int, q)
-    v = String(v)
-    reaction_formula[v] = ingredients
-    reaction_quantity[v] = q
+
+    need = DefaultDict{String, Int}(0)
+    have = DefaultDict{String, Int}(0)
+    return reaction_formula, reaction_quantity, need, have
 end
 
-need = DefaultDict{String, Int}(0)
-have = DefaultDict{String, Int}(0)
-
-function generate(element)
+function generate(element, need, have)
     for chemical in reaction_formula[element]
         need[chemical.name] += chemical.quantity
     end
@@ -110,11 +113,15 @@ function generate(element)
         if e == "ORE"
             continue
         end
-        while have[e] < need[e]
+        if have[e] < need[e]
             have[e] += reaction_quantity[e]
-            generate(e)
+            generate(e, need, have)
         end
     end
 end
 
-@time generate("FUEL")
+reaction_formula, reaction_quantity, need, have = parseData()
+@show generate("FUEL", need, have)
+@show need["ORE"]
+max_ore = 1000000000000
+ore_need_for_1_fuel = max_ore ÷ need["ORE"]
