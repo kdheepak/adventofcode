@@ -60,8 +60,8 @@ function part2(data = readInput())
     max_ore = 1000000000000
     min_fuel = max_ore ÷ need["ORE"]
     max_fuel = min_fuel * 1_000_000
-    while min_fuel < max_fuel-1
-        mid_fuel = (min_fuel + max_fuel) ÷ 2
+    while min_fuel < max_fuel
+        mid_fuel = (min_fuel + max_fuel) ÷ 2 + 1
         reaction_formula, reaction_quantity, need, have = parseData(data)
         need["FUEL"] = mid_fuel
         generate(reaction_formula, reaction_quantity, "FUEL", need, have)
