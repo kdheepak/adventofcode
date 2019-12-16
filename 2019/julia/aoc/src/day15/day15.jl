@@ -83,13 +83,13 @@ function draw(map, path = ComplexF64[])
             if x + im*y == 0 + 0im
                 print("O")
             elseif map[x + im*y] == 0
-                print(" ")
+                print("█")
             elseif map[x + im*y] == 2
                 print("X")
             elseif (x + im*y) ∈ path
                 print("x")
             elseif map[x + im*y] == 1
-                print(".")
+                print(" ")
             else
                 print(" ")
             end
