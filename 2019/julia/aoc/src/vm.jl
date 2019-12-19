@@ -3,28 +3,28 @@ using OffsetArrays
 
 abstract type OpCode end
 
-struct ADD <: OpCode end # add
-struct MUL <: OpCode end # multiple
-struct INP <: OpCode end # input
-struct OUT <: OpCode end # output
-struct JNZ <: OpCode end # jump if true
-struct JEZ <: OpCode end # jump if false
+struct ADD <: OpCode end # Add
+struct MUL <: OpCode end # Multiple
+struct INP <: OpCode end # Input
+struct OUT <: OpCode end # Output
+struct JNZ <: OpCode end # Jump if true
+struct JEZ <: OpCode end # Jump if false
 struct OLT <: OpCode end # One if less than
 struct OEQ <: OpCode end # One if equal
 struct ROF <: OpCode end # Relative offset
 struct END <: OpCode end # Halt
 
 OPCODE_LOOKUP = Dict(
-    01 => ADD(),
-    02 => MUL(),
-    03 => INP(),
-    04 => OUT(),
-    05 => JNZ(),
-    06 => JEZ(),
-    07 => OLT(),
-    08 => OEQ(),
-    09 => ROF(),
-    99 => END(),
+    01 => ADD(), # Add
+    02 => MUL(), # Multiple
+    03 => INP(), # Input
+    04 => OUT(), # Output
+    05 => JNZ(), # Jump if true
+    06 => JEZ(), # Jump if false
+    07 => OLT(), # One if less than
+    08 => OEQ(), # One if equal
+    09 => ROF(), # Relative offset
+    99 => END(), # Halt
 )
 
 opcode(op) = OPCODE_LOOKUP[op % 100]
