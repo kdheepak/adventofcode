@@ -56,7 +56,7 @@ input(c::Channel, x) = put!(c, x)
 """VM Interface function"""
 VM(code; input = channel(Int[]), output = channel(Int[]), maxsize = 2^16) = VM(code, input, output, maxsize)
 
-VM(code::String, input, output, maxsize) = VM([parse(Int, x) for x in split(strip(code), ",")], input, output, maxsize)
+VM(code::AbstractString, input, output, maxsize) = VM([parse(Int, x) for x in split(strip(code), ",")], input, output, maxsize)
 VM(code::Vector{T}, input, output, maxsize) where T <: Integer = VM(OffsetVector(copy(code), 0:(length(code) - 1)), input, output, maxsize)
 function VM(code::OffsetVector{Int, Vector{Int}}, input, output, maxsize = 2^16)
     for _ in 1:(maxsize - length(code))

@@ -1,9 +1,5 @@
 readInput() = read(joinpath(@__DIR__, "./input.txt"), String)
 
-
-part2(data = readInput()) = nothing
-
-
 include("../vm.jl")
 
 function beam_shape(data)
@@ -23,7 +19,6 @@ function beam_shape(data)
 end
 
 part1(data = readInput()) = count(==(1), values(beam_shape(data)))
-
 
 function draw_beam_shape(data)
     shape = beam_shape(data)

@@ -2,8 +2,6 @@ readInput() = read(joinpath(@__DIR__, "./input.txt"), String)
 
 include("../vm.jl")
 
-part2(data = readInput()) = nothing
-
 const NORTH = 1
 const SOUTH = 2
 const WEST = 3
