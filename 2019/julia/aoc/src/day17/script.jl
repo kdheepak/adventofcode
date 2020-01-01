@@ -10,7 +10,7 @@ function build_view(o)
 end
 
 function get_alignment(view)
-    alignment = 0
+    sum_alignment_parameter = 0
     x, y = size(view)
     for j in 2:y-1
         for i in 2:x-1
@@ -19,11 +19,11 @@ function get_alignment(view)
                 view[i, j+1] == '#' &&
                 view[i-1, j] == '#' &&
                 view[i, j-1] == '#'
-                alignment += (i-1)*(j-1)
+                sum_alignment_parameter += (i-1)*(j-1)
             end
         end
     end
-    return alignment
+    return sum_alignment_parameter
 end
 
 function part1(data = readInput())

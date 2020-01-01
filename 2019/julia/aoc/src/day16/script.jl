@@ -30,11 +30,6 @@ function part1(data = readInput())
     return join(signal[1:8])
 end
 
-@assert part1("80871224585914546619083218645595") == "24176176"
-@assert part1("19617804207202209144916044189917") == "73745418"
-@assert part1("69317163492948606335995924319873") == "52432133"
-@assert part1() == "85726502"
-
 function find_partial_phase(signal)
     input = copy(signal)
     for (i, d) in enumerate(cumsum(reverse(input[(length(input) ÷ 2):end])))
@@ -51,7 +46,26 @@ function part2(data = readInput())
     return join(signal[offset+1:offset+8])
 end
 
-@assert part2("03036732577212944063491565474664") == "84462026"
-@assert part2("02935109699940807407585447034323") == "78725270"
-@assert part2("03081770884921959731165446850517") == "53553731"
-@assert part2() == "92768399"
+using Test
+
+function runtests()
+
+    @testset "Day 16: Part 1" begin
+
+        @test part1("80871224585914546619083218645595") == "24176176"
+        @test part1("19617804207202209144916044189917") == "73745418"
+        @test part1("69317163492948606335995924319873") == "52432133"
+        @test part1() == "85726502"
+
+    end
+
+    @testset "Day 16: Part 2" begin
+
+        @test part2("03036732577212944063491565474664") == "84462026"
+        @test part2("02935109699940807407585447034323") == "78725270"
+        @test part2("03081770884921959731165446850517") == "53553731"
+        @test part2() == "92768399"
+
+    end
+
+end

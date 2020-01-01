@@ -64,3 +64,19 @@ function check_if_in_beam(x, y)
     push!(vm.input, y)
     return take!(vm.output) == 1 ? true : false
 end
+
+using Test
+
+function runtests()
+
+    @testset "Day 19: Part 1" begin
+        # TODO: add test
+        @test part1() == 110
+    end
+
+    @testset "Day 19: Part 2" begin
+        # TODO: add test
+        @test part2() == 17302065
+    end
+
+end

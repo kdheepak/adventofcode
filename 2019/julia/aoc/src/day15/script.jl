@@ -31,7 +31,7 @@ function part1(data = readInput())
     map = create_map(DefaultDict(UNEXPLORED))
     map = merge!(map, create_map(DefaultDict(UNEXPLORED), -im))
     path = bfs(copy(map))
-    draw(map, path)
+    # draw(map, path)
     return length(path)-1
 end
 
@@ -130,4 +130,18 @@ function part2(data = readInput())
         end
     end
     return longest
+end
+
+using Test
+
+function runtests()
+
+    @testset "Day 15: Part 1" begin
+        @test part1() == 228
+    end
+
+    @testset "Day 15: Part 2" begin
+        @test part2() == 348
+    end
+
 end

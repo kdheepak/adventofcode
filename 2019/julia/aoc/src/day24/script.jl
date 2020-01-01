@@ -1,6 +1,6 @@
 readInput() = read(joinpath(@__DIR__, "./input.txt"), String)
 
-part1(data = readInput()) = nothing
+part1(data = readInput()) = calculate_biodiversity_rating(find_cycle(strip(data)))
 
 part2(data = readInput()) = nothing
 
@@ -69,10 +69,28 @@ function calculate_biodiversity_rating(area)
     return s
 end
 
-test_data = """
-....#
-#..#.
-#..##
-..#..
-#....
-"""
+
+using Test
+
+function runtests()
+
+    test_data = """
+    ....#
+    #..#.
+    #..##
+    ..#..
+    #....
+    """
+
+    @testset "Day 24: Part 1" begin
+
+        @test part1(test_data) == 2129920
+        @test part1() == 7543003
+
+    end
+
+    @testset "Day 24: Part 2" begin
+
+    end
+end
+

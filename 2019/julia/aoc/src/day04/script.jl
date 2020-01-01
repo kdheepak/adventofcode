@@ -1,5 +1,3 @@
-using Test
-
 readInput() = "134792-675810"
 
 ispassword1(dif::Vector{Int}) = any(==(0), dif) && all(>=(0), dif)
@@ -17,6 +15,8 @@ function part2(data = readInput())
     lower, upper = parse.(Int, split(data, "-"))
     return count(ispassword2, lower:upper)
 end
+
+using Test
 
 function runtests()
     @testset "Day 04: Part 1" begin

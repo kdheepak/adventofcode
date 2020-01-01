@@ -7,9 +7,10 @@ export part1, part2
 for d in 1:25
     dstr = "day$(lpad(d, 2, "0"))"
     dsym = Symbol(dstr)
+    println("Loading module $dstr")
     eval(:(
         module $dsym
-            include($dstr * "/" * $dstr * ".jl")
+            include($dstr * "/" * "script.jl")
         end
     ))
 end
@@ -42,7 +43,7 @@ end
 function generate_readme(;day::Int)
     dstr = "day$(lpad(day, 2, "0"))"
     Literate.markdown(
-        "src/$dstr/$dstr.jl",
+        "src/$dstr/script.jl",
         "./src/$dstr/";
         config=Dict("name"=>"README"),
         documenter=false
