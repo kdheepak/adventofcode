@@ -5,9 +5,7 @@ readInput() = read(joinpath(@__DIR__, "./input.txt"), String)
 
 function expense_report(data, n)
     for items in combinations(data, n)
-        if sum(items) == 2020
-            return prod(items)
-        end
+        sum(items) == 2020 && prod(items)
     end
 end
 
