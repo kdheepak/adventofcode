@@ -13,10 +13,6 @@ function part1(data = readInput())
     expense_report(parse.(Int, split(strip(data))), 2)
 end
 
-@show part1()
-
 function part2(data = readInput())
     expense_report(parse.(Int, split(strip(data))), 3)
 end
-
-@show part2()
