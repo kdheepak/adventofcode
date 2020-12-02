@@ -4,6 +4,7 @@ using Combinatorics
 readInput() = read(joinpath(@__DIR__, "./input.txt"), String)
 
 function expense_report(data, n)
+    data = sorted(data)
     for items in combinations(data, n)
         sum(items) == 2020 && prod(items)
     end
