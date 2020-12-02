@@ -1,33 +1,25 @@
+# based on solution from https://github.com/Seelengrab/AdventOfCode
 readInput() = read(joinpath(@__DIR__, "./input.txt"), String)
 
-function part1(data = readInput())
-    c = 0
-    for line in split(strip(data), '\n')
-        policy, password = split(line, ':')
+function parseInput(data)
+    data = split(strip(data), '\n')
+    line_content = split.(data, ':')
+    return map(line_content) do (policy, password)
         rule, letter = split(policy, ' ')
-        low, high = split(rule, '-')
+        low, high = parse.(Int, split(rule, '-'))
         letter = [c for c in letter][1]
-        if parse(Int, low) <= length([c for c in password if c == letter]) <= parse(Int, high)
-            c += 1
-        end
+        (low, high, letter, strip(password))
     end
-    return c
+end
+
+function part1(data = readInput())
+    count(parseInput(data)) do (low, high, letter, password)
+        low <= count(==(letter), password) <= high
+    end
 end
 
 function part2(data = readInput())
-    c = 0
-    for line in split(strip(data), '\n')
-        policy, password = split(line, ':')
-        rule, letter = split(policy, ' ')
-        low, high = split(rule, '-')
-        letter = [c for c in letter][1]
-        low = parse(Int, low)
-        high = parse(Int, high)
-        password = strip(password)
-        C = [c for c in password]
-        if (C[low] == letter) ⊻ (C[high] == letter)
-            c += 1
-        end
+    count(parseInput(data)) do (low, high, letter, password)
+        (password[low] == letter) ⊻ (password[high] == letter)
     end
-    return c
 end
