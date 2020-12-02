@@ -25,7 +25,7 @@ function part2(data = readInput())
         high = parse(Int, high)
         password = strip(password)
         C = [c for c in password]
-        if (C[low] == letter && C[high] != letter) || (C[low] != letter && C[high] == letter)
+        if (C[low] == letter) ⊻ (C[high] == letter)
             c += 1
         end
     end
