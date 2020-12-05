@@ -10,6 +10,8 @@ function row(seat)
             max = min + limit
         elseif c == 'B'
             min = min + limit + 1
+        else
+            error("not expected to be here: $c")
         end
     end
     return min
@@ -23,6 +25,8 @@ function col(seat)
             max = min + limit
         elseif c == 'R'
             min = min + limit + 1
+        else
+            error("not expected to be here: $c")
         end
     end
     return min
