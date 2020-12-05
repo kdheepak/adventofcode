@@ -16,4 +16,6 @@ seatid(s) = reduce((x, y) -> (x << 1) | ((y == 'R') | (y == 'B')), s; init = 0)
 
 - Use `mapreduce`
 
+```julia
 println("Part 1: ", mapreduce(seatid, max, eachline("input.txt")))
+```
