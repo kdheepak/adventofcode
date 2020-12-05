@@ -1,10 +1,5 @@
 readInput() = strip(read(joinpath(@__DIR__, "./input.txt"), String))
 
-function part1(data = readInput())
-    data = split(data, '\n')
-    maximum([seat_id.(seat) for seat in data])
-end
-
 seat_id(seat) = row(seat) * 8 + col(seat)
 
 function row(seat)
@@ -22,7 +17,7 @@ end
 
 function col(seat)
     min, max = 0, 7
-    for c in seat[end-4:end]
+    for c in seat[end-2:end]
         limit = (max - min + 1) / 2 - 1
         if c == 'L'
             max = min + limit
@@ -31,6 +26,11 @@ function col(seat)
         end
     end
     return min
+end
+
+function part1(data = readInput())
+    data = split(data, '\n')
+    maximum([seat_id.(seat) for seat in data])
 end
 
 function part2(data = readInput())
