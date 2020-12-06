@@ -3,12 +3,10 @@
 
 **Learnings**
 
-One liners:
+One liner:
 
 ```julia
-
-part1(d) = sum(q->length(∪(Set.(q)...)),split.(split(d,"\n\n")))
-part2(d) = sum(q->length(∩(Set.(q)...)),split.(split(d,"\n\n")))
+p12(d) = [sum(q->length(f(Set.(q)...)),split.(split(d,"\n\n"))) for f in (∪,∩)]
 ```
 
 - \cap and \cup for set union and intersection
