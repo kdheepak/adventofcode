@@ -4,7 +4,7 @@ function part1(data = readInput())
     data = split(data, "\n\n")
     total = 0
     for group in data
-        questions = split(group, '\n')
+        questions = split(group, '\n', keepempty=false)
         counter = Set()
         for question in questions
             for c in question
