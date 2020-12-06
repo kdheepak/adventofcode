@@ -6,9 +6,8 @@
 One liners:
 
 ```julia
-part1(data = readInput()) = sum(q -> length(∪(Set.(q)...)), split.(split(data, "\n\n"), '\n', keepempty=false))
-
-part2(data = readInput()) = sum(q -> length(∩(Set.(q)...)), split.(split(data, "\n\n"), '\n', keepempty=false))
+part1(data) = sum(q->length(∪(Set.(q)...)),split.(split(data,"\n\n")))
+part2(data) = sum(q->length(∩(Set.(q)...)),split.(split(data,"\n\n")))
 ```
 
 - \cap and \cup for set union and intersection
