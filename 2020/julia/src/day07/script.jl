@@ -4,7 +4,6 @@ part1(data = readInput()) = length(calculate1(data, Set(["shiny gold"]))) - 1
 
 part2(data = readInput()) = calculate2(data, "shiny gold")
 
-
 function calculate1(data, valid_bags)
     old = copy(valid_bags)
     for rule in split(strip(data), '\n', keepempty = false)
