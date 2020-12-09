@@ -17,16 +17,12 @@ function check(numbers, n)
     false
 end
 
-part2(data = readInput()) = g(parse.(Int,split(data, '\n')))
+part2(data = readInput()) = solution2(parse.(Int,split(data, '\n')))
 
-function g(numbers)
+function solution2(numbers)
     idx, num = f(numbers)
-    relevant = @view numbers[1:idx-1]
-    for i in eachindex(relevant)
-        for j in i:lastindex(relevant)
-            window = @view relevant[i:j]
-            sum(window) == num && return sum(extrema(window))
-        end
+    for i in eachindex(numbers), j in i:lastindex(numbers)
+        sum(numbers[i:j]) == num && return sum(extrema(numbers[i:j]))
     end
 end
 
