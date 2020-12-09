@@ -7,32 +7,22 @@ part2(data = readInput()) = g(parse.(Int,split(data, '\n')))
 function f(numbers)
     preamble = 25
     for i in (preamble + 1):length(numbers)
-        if check(numbers[i-preamble:i-1], numbers[i])
-            continue
-        else
-            return numbers[i]
-            break
-        end
+        check(numbers[i-preamble:i-1], numbers[i]) && continue
+        return numbers[i]
     end
 end
 
 function check(numbers, n)
-    for i in numbers
-        for j in numbers
-            if i + j == n
-                return true
-            end
-        end
+    for i in numbers, j in numbers
+        i + j == n && return true
     end
     return false
 end
 
 function g(numbers)
     invalid_number = f(numbers)
-
     start_index = 1
     end_index = 1
-
     while true
         end_index += 1
         if sum(numbers[start_index:end_index]) == invalid_number
