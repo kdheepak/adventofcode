@@ -4,7 +4,6 @@ part1(data = readInput()) = f(parse.(Int,split(data, '\n')))
 
 part2(data = readInput()) = g(parse.(Int,split(data, '\n')))
 
-
 function f(numbers)
     preamble = 25
     for i in (preamble + 1):length(numbers)
