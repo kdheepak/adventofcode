@@ -2,13 +2,11 @@ readInput() = strip(read(joinpath(@__DIR__, "./input.txt"), String))
 
 part1(data = readInput()) = f(parse.(Int,split(data, '\n')))
 
-part2(data = readInput()) = g(parse.(Int,split(data, '\n')))
-
 function f(numbers)
     preamble = 25
     for i in (preamble + 1):length(numbers)
         check(numbers[i-preamble:i-1], numbers[i]) && continue
-        return numbers[i]
+        return i, numbers[i]
     end
 end
 
@@ -16,23 +14,19 @@ function check(numbers, n)
     for i in numbers, j in numbers
         i + j == n && return true
     end
-    return false
+    false
 end
 
+part2(data = readInput()) = g(parse.(Int,split(data, '\n')))
+
 function g(numbers)
-    invalid_number = f(numbers)
-    start_index = 1
-    end_index = 1
-    while true
-        end_index += 1
-        if sum(numbers[start_index:end_index]) == invalid_number
-            a = sort(numbers[start_index:end_index])
-            return a[begin] + a[end]
-        elseif sum(numbers[start_index:end_index]) > invalid_number + 1000
-            start_index += 1
-            end_index = start_index
+    idx, num = f(numbers)
+    relevant = @view numbers[1:idx-1]
+    for i in eachindex(relevant)
+        for j in i:lastindex(relevant)
+            window = @view relevant[i:j]
+            sum(window) == num && return sum(extrema(window))
         end
     end
-
 end
 
