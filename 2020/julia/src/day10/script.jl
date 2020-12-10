@@ -33,3 +33,7 @@ function j(data)
     end
     diff1 * (diff3+1), picks
 end
+
+function c(data)
+    data
+end
