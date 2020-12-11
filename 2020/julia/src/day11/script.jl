@@ -34,11 +34,8 @@ function sim1(grid)
     old_grid = copy(grid)
     for r in 1:rows, c in 1:cols
         A = adjacent_seats1(old_grid, r, c)
-        if grid[r, c] == 'L' && count(x -> x == '#', A) == 0
-            grid[r, c] = '#'
-        elseif grid[r, c] == '#' && count(x -> x == '#', A) >= 4
-            grid[r, c] = 'L'
-        end
+        grid[r, c] == 'L' && count(x -> x == '#', A) == 0 && ( grid[r, c] = '#' )
+        grid[r, c] == '#' && count(x -> x == '#', A) >= 4 && ( grid[r, c] = 'L' )
     end
 end
 
@@ -47,11 +44,8 @@ function sim2(grid)
     old_grid = copy(grid)
     for r in 1:rows, c in 1:cols
         A = adjacent_seats2(old_grid, r, c)
-        if grid[r, c] == 'L' && count(x -> x == '#', A) == 0
-            grid[r, c] = '#'
-        elseif grid[r, c] == '#' && count(x -> x == '#', A) >= 5
-            grid[r, c] = 'L'
-        end
+        grid[r, c] == 'L' && count(x -> x == '#', A) == 0 && ( grid[r, c] = '#' )
+        grid[r, c] == '#' && count(x -> x == '#', A) >= 5 && ( grid[r, c] = 'L' )
     end
 end
 
@@ -67,7 +61,6 @@ function adjacent_seats1(grid, i, j)
     i < R && push!(A, grid[i + 1, j])
     j > 1 && push!(A, grid[i, j - 1])
     j < C && push!(A, grid[i, j + 1])
-
     A
 end
 
