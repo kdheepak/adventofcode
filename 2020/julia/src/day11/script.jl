@@ -53,70 +53,22 @@ function adjacent_seats1(grid, i, j)
     A = []
     R = size(grid, 1)
     C = size(grid, 2)
-    i > 1 && j > 1 && push!(A, grid[i - 1, j - 1])
-    i > 1 && j < C && push!(A, grid[i - 1, j + 1])
-    i < R && j > 1 && push!(A, grid[i + 1, j - 1])
-    i < R && j < C && push!(A, grid[i + 1, j + 1])
-    i > 1 && push!(A, grid[i - 1, j])
-    i < R && push!(A, grid[i + 1, j])
-    j > 1 && push!(A, grid[i, j - 1])
-    j < C && push!(A, grid[i, j + 1])
+    for xy in CartesianIndex.([(i-1, j-1), (i-1, j+1), (i+1, j-1), (i+1, j+1), (i-1, j), (i+1, j), (i, j-1), (i, j+1)])
+        checkbounds(Bool, grid, xy) && push!(A, grid[xy])
+    end
     A
 end
 
 function adjacent_seats2(grid, i, j)
     A = []
 
-    R = size(grid, 1)
-    C = size(grid, 2)
-
-    counter = 1
-    while i > counter && j > counter && grid[i - counter, j - counter] == '.'
-        counter += 1
+    for direction in CartesianIndex.([(-1,-1), (-1,+1), (+1,-1), (+1, +1), (-1,0), (+1,0), (0,-1), (0,+1)])
+        xy = CartesianIndex(i, j) + direction
+        while checkbounds(Bool, grid, xy) && grid[xy] == '.'
+            xy += direction
+        end
+        checkbounds(Bool, grid, xy) && push!(A, grid[xy])
     end
-    i > counter && j > counter && push!(A, grid[i - counter, j - counter])
-
-    counter = 1
-    while i > counter && j < C - counter + 1 && grid[i - counter, j + counter] == '.'
-        counter += 1
-    end
-    i > counter && j < C - counter + 1 && push!(A, grid[i - counter, j + counter])
-
-    counter = 1
-    while i < R - counter + 1 && j > counter && grid[i + counter, j - counter] == '.'
-        counter += 1
-    end
-    i < R - counter + 1 && j > counter && push!(A, grid[i + counter, j - counter])
-
-    counter = 1
-    while i < R - counter + 1 && j < C  - counter + 1 && grid[i + counter, j + counter] == '.'
-        counter += 1
-    end
-    i < R - counter + 1 && j < C  - counter + 1 && push!(A, grid[i + counter, j + counter])
-
-    counter = 1
-    while i > counter && grid[i - counter, j] == '.'
-        counter += 1
-    end
-    i > counter && push!(A, grid[i - counter, j])
-
-    counter = 1
-    while i < R - counter + 1 && grid[i + counter, j] == '.'
-        counter += 1
-    end
-    i < R - counter + 1 && push!(A, grid[i + counter, j])
-
-    counter = 1
-    while j > counter && grid[i, j - counter] == '.'
-        counter += 1
-    end
-    j > counter && push!(A, grid[i, j - counter])
-
-    counter = 1
-    while j < C - counter + 1 && grid[i, j + counter] == '.'
-        counter += 1
-    end
-    j < C - counter + 1 && push!(A, grid[i, j + counter])
 
     A
 end
