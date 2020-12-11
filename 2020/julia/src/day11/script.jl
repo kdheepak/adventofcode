@@ -51,8 +51,6 @@ end
 
 function adjacent_seats1(grid, i, j)
     A = []
-    R = size(grid, 1)
-    C = size(grid, 2)
     for xy in CartesianIndex.([(i-1, j-1), (i-1, j+1), (i+1, j-1), (i+1, j+1), (i-1, j), (i+1, j), (i, j-1), (i, j+1)])
         checkbounds(Bool, grid, xy) && push!(A, grid[xy])
     end
@@ -61,7 +59,6 @@ end
 
 function adjacent_seats2(grid, i, j)
     A = []
-
     for direction in CartesianIndex.([(-1,-1), (-1,+1), (+1,-1), (+1, +1), (-1,0), (+1,0), (0,-1), (0,+1)])
         xy = CartesianIndex(i, j) + direction
         while checkbounds(Bool, grid, xy) && grid[xy] == '.'
@@ -69,6 +66,5 @@ function adjacent_seats2(grid, i, j)
         end
         checkbounds(Bool, grid, xy) && push!(A, grid[xy])
     end
-
     A
 end
