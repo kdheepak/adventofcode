@@ -16,18 +16,8 @@ function f(data)
         action == 'E' && ( current += move )
         action == 'W' && ( current -= move )
         action == 'F' && ( current += direction * move )
-        action == 'L' && begin
-            while move / 90 != 0
-                direction *= im
-                move -= 90
-            end
-        end
-        action == 'R' && begin
-            while move / 90 != 0
-                direction *= -im
-                move -= 90
-            end
-        end
+        action == 'L' && ( direction *= im^(move ÷ 90) )
+        action == 'R' && ( direction *= (-im)^(move ÷ 90) )
     end
     abs(current.re) + abs(current.im)
 end
@@ -46,18 +36,8 @@ function g(data)
         action == 'E' && ( waypoint += move )
         action == 'W' && ( waypoint -= move )
         action == 'F' && ( current += waypoint * move )
-        action == 'L' && begin
-            while move / 90 != 0
-                waypoint *= im
-                move -= 90
-            end
-        end
-        action == 'R' && begin
-            while move / 90 != 0
-                waypoint *= -im
-                move -= 90
-            end
-        end
+        action == 'L' && ( waypoint *= im^(move ÷ 90) )
+        action == 'R' && ( waypoint *= (-im)^(move ÷ 90) )
     end
     abs(current.re) + abs(current.im)
 end
