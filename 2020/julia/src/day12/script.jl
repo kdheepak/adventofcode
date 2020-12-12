@@ -22,7 +22,6 @@ function f(data)
     abs(current.re) + abs(current.im)
 end
 
-
 function g(data)
     waypoint = 10 + 1im
     current = 0 + 0im
