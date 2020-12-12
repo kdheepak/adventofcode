@@ -11,26 +11,22 @@ function f(data)
         d[1], parse(Int, d[2:end])
     end
     for (action, move) in data
-        if action == 'N'
-            current += move * (0 + 1im)
-        elseif action == 'S'
-            current += move * (0 - 1im)
-        elseif action == 'E'
-            current += move * (1 + 0im)
-        elseif action == 'W'
-            current += move * (-1 + 0im)
-        elseif action == 'L'
+        action == 'N' && ( current += move * im )
+        action == 'S' && ( current -= move * im )
+        action == 'E' && ( current += move )
+        action == 'W' && ( current -= move )
+        action == 'F' && ( current += direction * move )
+        action == 'L' && begin
             while move / 90 != 0
                 direction *= im
                 move -= 90
             end
-        elseif action == 'R'
+        end
+        action == 'R' && begin
             while move / 90 != 0
                 direction *= -im
                 move -= 90
             end
-        elseif action == 'F'
-            current += direction * move
         end
     end
     abs(current.re) + abs(current.im)
@@ -45,26 +41,22 @@ function g(data)
         d[1], parse(Int, d[2:end])
     end
     for (action, move) in data
-        if action == 'N'
-            waypoint += move * (0 + 1im)
-        elseif action == 'S'
-            waypoint += move * (0 - 1im)
-        elseif action == 'E'
-            waypoint += move * (1 + 0im)
-        elseif action == 'W'
-            waypoint += move * (-1 + 0im)
-        elseif action == 'L'
+        action == 'N' && ( waypoint += move * im )
+        action == 'S' && ( waypoint -= move * im )
+        action == 'E' && ( waypoint += move )
+        action == 'W' && ( waypoint -= move )
+        action == 'F' && ( current += waypoint * move )
+        action == 'L' && begin
             while move / 90 != 0
                 waypoint *= im
                 move -= 90
             end
-        elseif action == 'R'
+        end
+        action == 'R' && begin
             while move / 90 != 0
                 waypoint *= -im
                 move -= 90
             end
-        elseif action == 'F'
-            current += waypoint * move
         end
     end
     abs(current.re) + abs(current.im)
