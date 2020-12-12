@@ -32,7 +32,6 @@ function f(data)
         elseif action == 'F'
             current += direction * move
         end
-        @show action, move, current
     end
     abs(current.re) + abs(current.im)
 end
@@ -67,7 +66,6 @@ function g(data)
         elseif action == 'F'
             current += waypoint * move
         end
-        @show action, move, current
     end
     abs(current.re) + abs(current.im)
 end
