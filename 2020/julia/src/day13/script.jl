@@ -6,18 +6,13 @@ part2(data = readInput()) = g(strip(data))
 
 function f(data)
     time, schedules = split(data, '\n')
-    time = parse(Int, time)
-    schedules = parse.(Int, filter(!=("x"), split(schedules, ',')))
+    time, schedules = parse(Int, time), parse.(Int, filter(!=("x"), split(schedules, ',')))
     times = []
-    for s in schedules
-        for i in 0:s
-            if mod(time + i, s) == 0
-                push!(times, s => time + i)
-            end
-        end
+    for s in schedules, i in 1:s
+        mod(time + i, s) == 0 && push!(times, s => time + i)
     end
-    sort!(times, by = x -> x.second)
-    times[begin].first * (times[begin].second - time)
+    b, t = first(sort!(times, by = x -> x.second))
+    b * (t - time)
 end
 
 function g(data)
@@ -27,22 +22,16 @@ function g(data)
     end
     schedules = [(i-1) => s for (i, s) in enumerate(schedules) if s != 0]
     time = 0
-    previous_schedule = schedules[1].second
-    index = 2
-    @show previous_schedule
+    _, previous_schedule = schedules[1]
+    i = 2
     while true
-        if index > length(schedules)
-            break
-        end
-        busid, schedule = schedules[index]
-        @show busid, previous_schedule, schedule, time
+        i > length(schedules) && break
+        busid, schedule = schedules[i]
         if mod(time + busid, schedule) == 0
-            @show previous_schedule, schedule, lcm(previous_schedule, schedule)
             previous_schedule = lcm(previous_schedule, schedule)
-            index += 1
+            i += 1
         else
             time += previous_schedule
-            @show time
         end
     end
     time
