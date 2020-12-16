@@ -42,8 +42,8 @@ function g(data)
     end
     valid_tickets = deleteat!(nearby_tickets, invalid_tickets)
 
+    # mark fields to rule mapping as false where at least one of the rules is not valid
     valid = ones(Bool, length(rules), length(rules))
-
     for ticket in valid_tickets, (i, field) in enumerate(ticket), (j, rule) in enumerate(rules)
         _, (rule1, rule2) = rule
         !(field ∈ rule1 || field ∈ rule2) && ( valid[i, j] = false )
@@ -53,10 +53,10 @@ function g(data)
     accounted_for = Set{Int}()
     while length(accounted_for) != length(rules)
         for i in 1:length(rules)
-            index = [j for j in 1:length(rules) if valid[i, j] && j ∉ accounted_for]
-            if length(index) == 1
-                final[i] = only(index)
-                push!(accounted_for, only(index))
+            valid_rules = [j for j in 1:length(rules) if valid[i, j] && j ∉ accounted_for]
+            if length(valid_rules) == 1
+                final[i] = only(valid_rules)
+                push!(accounted_for, only(valid_rules))
             end
         end
     end
