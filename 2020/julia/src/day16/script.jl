@@ -17,7 +17,6 @@ function f(data)
 
     invalid_fields = Int[]
     for ticket in nearby_tickets, field in ticket
-        # Doesn't satisfy any rule
         !any([field ∈ rule for rule in Iterators.flatten(values(rules))]) && push!(invalid_fields, field)
     end
     sum(invalid_fields)
@@ -42,7 +41,6 @@ function g(data)
     end
     valid_tickets = deleteat!(nearby_tickets, invalid_tickets)
 
-    # mark fields to rule mapping as false where at least one of the rules is not valid
     valid = ones(Bool, length(first(valid_tickets)), length(rules))
     for ticket in valid_tickets, (i, field) in enumerate(ticket), (j, rule) in enumerate(rules)
         _, (rule1, rule2) = rule
