@@ -38,10 +38,9 @@ function g(data)
 
     invalid_tickets = Int[]
     for (i, ticket) in enumerate(nearby_tickets), field in ticket
-        # Doesn't satisfy any rule
         !any([field ∈ rule for rule in Iterators.flatten(values(rules))]) && push!(invalid_tickets, i)
     end
-    valid_tickets = deleteat!(nearby_tickets, sort(collect(Set(invalid_tickets))))
+    valid_tickets = deleteat!(nearby_tickets, invalid_tickets)
 
     matrix = ones(Bool, length(rules), length(rules))
 
