@@ -6,76 +6,48 @@ part2(data = readInput()) = g(strip(data))
 
 function f(data)
     rules, your_ticket, nearby_tickets = split(data, "\n\n")
-    rules = split.([r for (_,r) in split.(split(rules, '\n'), ": ")], " or ")
-
-    rules = map(rules) do rule
-        r1,r2 = rule
-        r1 = parse.(Int, split(r1, '-'))
-        r2 = parse.(Int, split(r2, '-'))
-        [Set(collect(r1[1]:r1[2])), Set(collect(r2[1]:r2[2]))]
-    end
+    rules = Dict(map(split(rules, '\n')) do rule
+        m = match(r"([\w ]+): (\d+)-(\d+) or (\d+)-(\d+)", rule)
+        rule, r1start, r1end, r2start, r2end = m[1], m[2], m[3], m[4], m[5]
+        r1start, r1end, r2start, r2end = parse.(Int, [r1start, r1end, r2start, r2end])
+        rule => (r1start:r1end, r2start:r2end)
+    end)
 
     nearby_tickets = [parse.(Int, ticket) for ticket in split.(split(nearby_tickets, '\n')[2:end], ',')]
 
     invalid_fields = Int[]
-    for ticket in nearby_tickets
-        for ticket_field in ticket
-            is_valid = []
-            for rule_field in rules
-                rule1, rule2 = rule_field
-                push!(is_valid, ticket_field ∈ rule1 || ticket_field ∈ rule2)
-            end
-            if !any(is_valid)
-                push!(invalid_fields, ticket_field)
-            end
-        end
+    for ticket in nearby_tickets, field in ticket
+        # Doesn't satisfy any rule
+        !any([field ∈ rule for rule in Iterators.flatten(values(rules))]) && push!(invalid_fields, field)
     end
     sum(invalid_fields)
-
 end
 
 function g(data)
     rules, your_ticket, nearby_tickets = split(data, "\n\n")
-    rules = split.([r for (_,r) in split.(split(rules, '\n'), ": ")], " or ")
-
-    rules = map(rules) do rule
-        r1,r2 = rule
-        r1 = parse.(Int, split(r1, '-'))
-        r2 = parse.(Int, split(r2, '-'))
-        [Set(collect(r1[1]:r1[2])), Set(collect(r2[1]:r2[2]))]
-    end
+    rules = Dict(map(split(rules, '\n')) do rule
+        m = match(r"([\w ]+): (\d+)-(\d+) or (\d+)-(\d+)", rule)
+        rule, r1start, r1end, r2start, r2end = m[1], m[2], m[3], m[4], m[5]
+        r1start, r1end, r2start, r2end = parse.(Int, [r1start, r1end, r2start, r2end])
+        rule => (r1start:r1end, r2start:r2end)
+    end)
 
     your_ticket = parse.(Int, split(split(your_ticket, '\n')[2], ','))
 
     nearby_tickets = [parse.(Int, ticket) for ticket in split.(split(nearby_tickets, '\n')[2:end], ',')]
 
-    invalid_fields = Int[]
-    valid_tickets = Vector{Int}[]
-    for ticket in nearby_tickets
-        is_valid_ticket = true
-        for ticket_field in ticket
-            is_valid = []
-            for rule_field in rules
-                rule1, rule2 = rule_field
-                push!(is_valid, ticket_field ∈ rule1 || ticket_field ∈ rule2)
-            end
-            if !any(is_valid)
-                is_valid_ticket = false
-                push!(invalid_fields, ticket_field)
-            end
-        end
-        is_valid_ticket && (push!(valid_tickets, ticket))
+    invalid_tickets = Int[]
+    for (i, ticket) in enumerate(nearby_tickets), field in ticket
+        # Doesn't satisfy any rule
+        !any([field ∈ rule for rule in Iterators.flatten(values(rules))]) && push!(invalid_tickets, i)
     end
+    valid_tickets = deleteat!(nearby_tickets, sort(collect(Set(invalid_tickets))))
 
     matrix = ones(Bool, length(rules), length(rules))
 
-    for ticket in valid_tickets
-        for (i, field) in enumerate(ticket)
-            for (j, rule) in enumerate(rules)
-                rule1, rule2 = rule
-                !(field ∈ rule1 || field ∈ rule2) && ( matrix[i, j] = 0 )
-            end
-        end
+    for ticket in valid_tickets, (i, field) in enumerate(ticket), (j, rule) in enumerate(rules)
+        _, (rule1, rule2) = rule
+        !(field ∈ rule1 || field ∈ rule2) && ( matrix[i, j] = 0 )
     end
 
     final = [0 for _ in 1:length(rules)]
@@ -89,27 +61,12 @@ function g(data)
             end
         end
     end
-    final
     answer = 1
-    for interest in 1:6
+    for (interest, k) in enumerate(keys(rules))
+        !startswith(k, "departure") && continue
         for (i, index) in enumerate(final)
-            if index == interest
-                # @show i, index
-                answer *= your_ticket[i]
-            end
+            index == interest && ( answer *= your_ticket[i] )
         end
     end
     answer
-end
-
-
-function find_which_rules(ticket_field, rules)
-    A = Int[]
-    for (i,rule_field) in enumerate(rules)
-        rule1, rule2 = rule_field
-        if !(ticket_field ∈ rule1 || ticket_field ∈ rule2)
-            push!(A, i)
-        end
-    end
-    return A
 end
