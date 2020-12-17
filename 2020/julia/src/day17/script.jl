@@ -70,14 +70,15 @@ function find_next_state1(pocket, x, y, z)
 end
 
 const NEIGHBORS2 = CartesianIndex[]
-
-for i in (0, 1, -1), j in (0, 1, -1), k in (0, 1, -1), l in (0, 1, -1)
+DIMS = (-1, 0, 1)
+for i in DIMS, j in DIMS, k in DIMS, l in DIMS
     push!(NEIGHBORS2, CartesianIndex(i, j, k, l))
 end
 
 const NEIGHBORS3 = CartesianIndex[]
 
-for i in (0, 1, -1, 2, -2), j in (0, 1, -1, 2, -2), k in (0, 1, -1, 2, -2), l in (0, 1, -1, 2, -2)
+DIMS = (0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6)
+for i in DIMS, j in DIMS, k in DIMS, l in DIMS
     push!(NEIGHBORS3, CartesianIndex(i, j, k, l))
 end
 
@@ -91,16 +92,17 @@ function g(data)
 
     pocket = Dict{NTuple{4, Int64}, Bool}()
 
-    for j in 1:size(grid, 2), i in 1:size(grid, 1)
-        pocket[(i, j, 1, 1)] = grid[i, j]
+    for j in 0:(size(grid, 2) - 1), i in 0:(size(grid, 1)-1)
+        pocket[(i, j, 0, 0)] = grid[i + 1, j + 1]
     end
 
     cycle = 1
+    # visualize(pocket, 0, 0)
     while true
-        cycle > 1 && break
+        cycle > 6 && break
         seen = Set{NTuple{4, Int64}}()
         tmp = Dict{NTuple{4, Int64}, Bool}()
-        for k in collect(keys(pocket)), n in NEIGHBORS3
+        for k in collect(keys(pocket)), n in NEIGHBORS2
             xk, yk, zk, wk = k
             xn, yn, zn, wn = n.I
             push!(seen, (xk + xn, yk + yn, zk + zn, wk + wn))
@@ -111,17 +113,17 @@ function g(data)
         for k in keys(tmp)
             pocket[k] = tmp[k]
         end
-        visualize(pocket)
+        # visualize(pocket)
         cycle += 1
     end
+    count(values(pocket))
 end
 
-function visualize(pocket)
-    w = 0
-    for w in (-1, 0, 1), z in (-1, 0, 1)
+function visualize(pocket, W = (0), Z = (0, -1))
+    for w in W, z in Z
         @show z, w
-        for x in 1:3
-            for y in 1:3
+        for x in 0:5
+            for y in 0:5
                 print(haskey(pocket, (x, y, z, w)) && pocket[(x,y,z,w)] ? "#" : ".")
             end
             println()
@@ -136,16 +138,16 @@ function find_next_state2(pocket, x, y, z, w)
         xindex == 0 && yindex == 0 && zindex == 0 && windex == 0 && continue
         c = haskey(pocket, (x + xindex, y + yindex, z + zindex, w + windex)) ? pocket[(x + xindex, y + yindex, z + zindex, w + windex)] == 1 : false
         cell = c ? '#' : '.'
-        x == 1 && y == 1 && z == 0 && w == 0 && @show x + xindex, y + yindex, z + zindex, w + windex, cell, i
         push!(counter, c)
     end
-    if ( count(counter) == 2 || count(counter) == 3 ) && haskey(pocket, (x, y, z)) && pocket[x, y, z]
-        return true
+    if ( count(counter) == 2 || count(counter) == 3 ) && haskey(pocket, (x, y, z, w)) && pocket[x, y, z, w]
+        r = true
     elseif !haskey(pocket, (x, y, z, w)) && count(counter) == 3
-        return true
+        r = true
     elseif haskey(pocket, (x, y, z, w)) && pocket[x, y, z, w] == false && count(counter) == 3
-        return true
+        r = true
     else
-        return false
+        r = false
     end
+    r
 end
