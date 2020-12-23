@@ -185,7 +185,7 @@ function g(data)
     current_cup = next(current_cup)
     push!(r, current_cup.label)
 
-    @show r
+    prod(r)
 end
 
 function show_cups2(current, maximum_label)
