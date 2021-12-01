@@ -75,46 +75,31 @@ fn main() -> Result<()> {
     let matches = app.get_matches();
     match matches.subcommand() {
         Some(("submit", matches)) => {
-            match matches.value_of("day") {
-                Some(d) => {
-                    let day = d.parse::<_>().expect("Unable to parse input day");
-                    let input = get_input(day);
-                    let problem = get_problem(day).expect("Unable to create problem.");
-
-                    match matches.value_of("part") {
-                        Some("1") => {
-                            let answer = problem.part_one(&input).unwrap();
-                            println!("Part 1: {}", answer);
-                            submit_solution(day, 1, answer)?;
-                            println!("Successfully submitted solution for day {} part 1", d);
-                        }
-                        Some("2") => {
-                            let answer = problem.part_two(&input).unwrap();
-                            println!("Part 2: {}", answer);
-                            submit_solution(day, 2, answer)?;
-                            println!("Successfully submitted solution for day {} part 2", d);
-                        }
-                        _ => {
-                            panic!("Invalid part for submitting solution");
-                        }
-                    }
-                }
-                None => {
-                    panic!("Expected valid day command line input");
-                }
-            };
+            let day = matches
+                .value_of("day")
+                .expect("Expected valid day command line input")
+                .parse::<_>()
+                .expect("Unable to parse input day");
+            let part = matches
+                .value_of("part")
+                .expect("Expected valid day command line input")
+                .parse::<_>()
+                .expect("Unable to parse input part");
+            let answer = solve_problem(day, part)?;
+            submit_solution(day, part, answer)?;
+            println!(
+                "Successfully submitted solution for day {} part {}",
+                day, part
+            );
         }
         Some(("download", matches)) => {
-            match matches.value_of("day") {
-                Some(d) => {
-                    let d = d.parse::<_>().expect("Unable to parse input day");
-                    get_input(d);
-                    println!("Successfully downloaded input for day {}", d);
-                }
-                None => {
-                    panic!("Expected valid day command line input");
-                }
-            };
+            let day = matches
+                .value_of("day")
+                .expect("Expected valid day command line input")
+                .parse::<_>()
+                .expect("Unable to parse input day");
+            get_input(day);
+            println!("Successfully downloaded input for day {}", day);
         }
         Some(("solve", matches)) => {
             let day = matches
@@ -130,10 +115,8 @@ fn main() -> Result<()> {
             let answer = solve_problem(day, part)?;
             println!("Day {:02} Part {} : {}", day, part, answer);
         }
-        None => {}
         _ => {}
     }
-
     Ok(())
 }
 
