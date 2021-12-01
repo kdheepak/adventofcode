@@ -19,6 +19,27 @@ pub fn generate_cli_app() -> App<'static> {
         .about(crate_description!())
         .license(crate_license!())
         .subcommand(
+            App::new("submit")
+                .arg(
+                    Arg::new("day")
+                        .short('d')
+                        .long("day")
+                        .takes_value(true)
+                        .multiple_values(false)
+                        .max_values(1)
+                        .min_values(1),
+                )
+                .arg(
+                    Arg::new("part")
+                        .short('p')
+                        .long("part")
+                        .takes_value(true)
+                        .multiple_values(true)
+                        .max_values(1)
+                        .min_values(1),
+                ),
+        )
+        .subcommand(
             App::new("solve")
                 .arg(
                     Arg::new("day")
@@ -53,6 +74,36 @@ fn main() -> Result<()> {
     let app = generate_cli_app();
     let matches = app.get_matches();
     match matches.subcommand() {
+        Some(("submit", matches)) => {
+            match matches.value_of("day") {
+                Some(d) => {
+                    let day = d.parse::<_>().expect("Unable to parse input day");
+                    let input = get_input(day);
+                    let problem = get_problem(day).expect("Unable to create problem.");
+
+                    match matches.value_of("part") {
+                        Some("1") => {
+                            let answer = problem.part_one(&input).unwrap();
+                            println!("Part 1: {}", answer);
+                            submit_solution(day, 1, answer)?;
+                            println!("Successfully submitted solution for day {} part 1", d);
+                        }
+                        Some("2") => {
+                            let answer = problem.part_two(&input).unwrap();
+                            println!("Part 2: {}", answer);
+                            submit_solution(day, 2, answer)?;
+                            println!("Successfully submitted solution for day {} part 2", d);
+                        }
+                        _ => {
+                            panic!("Invalid part for submitting solution");
+                        }
+                    }
+                }
+                None => {
+                    panic!("Expected valid day command line input");
+                }
+            };
+        }
         Some(("download", matches)) => {
             match matches.value_of("day") {
                 Some(d) => {
@@ -84,14 +135,35 @@ fn main() -> Result<()> {
 }
 
 fn download_input(day: usize) -> Result<String> {
-    let client = reqwest::blocking::Client::new();
+    let client = make_client();
     let url = format!("https://adventofcode.com/2021/day/{}/input", day);
-    let cookie = format!("session={}", env!("ADVENTOFCODE_SESSION"));
-    let resp = client
-        .get(url.as_str())
-        .header(reqwest::header::COOKIE, cookie)
-        .send()?;
+    let resp = client.get(url.as_str()).send()?;
     Ok(resp.text()?)
+}
+
+fn submit_solution(day: usize, level: usize, answer: String) -> Result<String> {
+    let client = make_client();
+    let url = format!("https://adventofcode.com/2021/day/{}/answer", day);
+    let mut params = std::collections::HashMap::new();
+    params.insert("level", level.to_string());
+    params.insert("answer", answer);
+    dbg!(&params);
+    let resp = client.post(url).form(&params).send()?;
+    dbg!(&resp);
+    Ok(resp.text()?)
+}
+
+fn make_client() -> reqwest::blocking::Client {
+    let mut headers = reqwest::header::HeaderMap::default();
+    let cookie = reqwest::header::HeaderValue::from_str(
+        format!("session={}", env!("ADVENTOFCODE_SESSION")).as_str(),
+    )
+    .unwrap();
+    headers.insert("Cookie", cookie);
+    reqwest::blocking::Client::builder()
+        .default_headers(headers)
+        .build()
+        .unwrap()
 }
 
 fn get_input(day: usize) -> String {
