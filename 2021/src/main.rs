@@ -117,8 +117,16 @@ fn main() -> Result<()> {
             };
         }
         Some(("solve", matches)) => {
-            let day = matches.value_of("day").expect("Expected valid day command line input").parse::<_>().expect("Unable to parse input day");
-            let part = matches.value_of("part").expect("Expected valid day command line input").parse::<_>().expect("Unable to parse input part");
+            let day = matches
+                .value_of("day")
+                .expect("Expected valid day command line input")
+                .parse::<_>()
+                .expect("Unable to parse input day");
+            let part = matches
+                .value_of("part")
+                .expect("Expected valid day command line input")
+                .parse::<_>()
+                .expect("Unable to parse input part");
             let answer = solve_problem(day, part)?;
             println!("Day {:02} Part {} : {}", day, part, answer);
         }
@@ -182,15 +190,9 @@ fn solve_problem(day: usize, part: usize) -> Result<String> {
     let problem = get_problem(day).expect("Unable to create problem.");
 
     match part {
-        1 => {
-            Ok(problem.part_one(&input).unwrap())
-        }
-        2 => {
-            Ok(problem.part_two(&input).unwrap())
-        }
-        _ => {
-            Err(anyhow!("Unable to solve for part {}", part))
-        }
+        1 => Ok(problem.part_one(&input).unwrap()),
+        2 => Ok(problem.part_two(&input).unwrap()),
+        _ => Err(anyhow!("Unable to solve for part {}", part)),
     }
 }
 
