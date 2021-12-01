@@ -55,7 +55,7 @@ pub fn generate_cli_app() -> App<'static> {
                         .takes_value(true)
                         .multiple_values(true)
                         .max_values(1)
-                        .min_values(0),
+                        .min_values(1),
                 ),
         )
         .subcommand(
@@ -117,15 +117,10 @@ fn main() -> Result<()> {
             };
         }
         Some(("solve", matches)) => {
-            match matches.value_of("day") {
-                Some(d) => solve_problem(
-                    d.parse::<_>().expect("Unable to parse input day"),
-                    matches.value_of("part"),
-                )?,
-                None => {
-                    panic!("Expected valid day command line input");
-                }
-            };
+            let day = matches.value_of("day").expect("Expected valid day command line input").parse::<_>().expect("Unable to parse input day");
+            let part = matches.value_of("part").expect("Expected valid day command line input").parse::<_>().expect("Unable to parse input part");
+            let answer = solve_problem(day, part)?;
+            println!("Day {:02} Part {} : {}", day, part, answer);
         }
         None => {}
         _ => {}
@@ -182,24 +177,21 @@ fn get_input(day: usize) -> String {
     fs::read_to_string(input).expect("Unable to read inputs")
 }
 
-fn solve_problem(day: usize, part: Option<&str>) -> Result<()> {
+fn solve_problem(day: usize, part: usize) -> Result<String> {
     let input = get_input(day);
     let problem = get_problem(day).expect("Unable to create problem.");
 
     match part {
-        Some("1") => {
-            println!("Part 1: {}", problem.part_one(&input).unwrap());
+        1 => {
+            Ok(problem.part_one(&input).unwrap())
         }
-        Some("2") => {
-            println!("Part 2: {}", problem.part_two(&input).unwrap());
+        2 => {
+            Ok(problem.part_two(&input).unwrap())
         }
         _ => {
-            println!("Part 1: {}", problem.part_one(&input).unwrap());
-            println!("Part 2: {}", problem.part_two(&input).unwrap());
+            Err(anyhow!("Unable to solve for part {}", part))
         }
-    };
-
-    Ok(())
+    }
 }
 
 fn get_problem(day: usize) -> Option<Box<dyn Problem>> {
