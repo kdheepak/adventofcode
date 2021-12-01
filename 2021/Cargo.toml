@@ -10,3 +10,4 @@ clap = "3.0.0-beta.5"
 lazy_static = "1.4.0"
 regex = "1"
 anyhow = "1.0.43"
+reqwest = { version = "0.11", features = ["blocking"] }

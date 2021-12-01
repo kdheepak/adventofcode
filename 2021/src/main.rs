@@ -6,7 +6,7 @@ use anyhow::{anyhow, Result};
 use clap::{crate_authors, crate_description, crate_license, crate_name, crate_version, App, Arg};
 
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use aoc2021::day01::DayOne;
 
@@ -18,15 +18,33 @@ pub fn generate_cli_app() -> App<'static> {
         .author(crate_authors!("\n"))
         .about(crate_description!())
         .license(crate_license!())
-        .arg("-d..., --debug... 'Turn debugging information on'")
-        .arg("--part=<NUMBER> 'Part of day'")
-        .arg(
-            Arg::new("day")
-                .about("Day")
-                .index(1)
-                .required(true)
-                .multiple_values(false)
-                .takes_value(true),
+        .subcommand(
+            App::new("solve")
+                .arg(
+                    Arg::new("day")
+                        .short('d')
+                        .long("day")
+                        .takes_value(true)
+                        .multiple_values(false),
+                )
+                .arg(
+                    Arg::new("part")
+                        .short('p')
+                        .long("part")
+                        .takes_value(true)
+                        .multiple_values(true)
+                        .max_values(1)
+                        .min_values(0),
+                ),
+        )
+        .subcommand(
+            App::new("download").arg(
+                Arg::new("day")
+                    .short('d')
+                    .long("day")
+                    .takes_value(true)
+                    .multiple_values(false),
+            ),
         );
     app
 }
@@ -34,18 +52,46 @@ pub fn generate_cli_app() -> App<'static> {
 fn main() -> Result<()> {
     let app = generate_cli_app();
     let matches = app.get_matches();
-
-    match matches.value_of("day") {
-        Some(d) => solve_problem(
-            d.parse::<_>().expect("Unable to parse input day"),
-            matches.value_of("part"),
-        )?,
-        None => {
-            panic!("Expected valid day command line input");
+    match matches.subcommand() {
+        Some(("download", matches)) => {
+            match matches.value_of("day") {
+                Some(d) => {
+                    let d = d.parse::<_>().expect("Unable to parse input day");
+                    get_input(d);
+                    println!("Successfully downloaded input for day {}", d);
+                }
+                None => {
+                    panic!("Expected valid day command line input");
+                }
+            };
         }
-    };
+        Some(("solve", matches)) => {
+            match matches.value_of("day") {
+                Some(d) => solve_problem(
+                    d.parse::<_>().expect("Unable to parse input day"),
+                    matches.value_of("part"),
+                )?,
+                None => {
+                    panic!("Expected valid day command line input");
+                }
+            };
+        }
+        None => {}
+        _ => {}
+    }
 
     Ok(())
+}
+
+fn download_input(day: usize) -> Result<String> {
+    let client = reqwest::blocking::Client::new();
+    let url = format!("https://adventofcode.com/2021/day/{}/input", day);
+    let cookie = format!("session={}", env!("ADVENTOFCODE_SESSION"));
+    let resp = client
+        .get(url.as_str())
+        .header(reqwest::header::COOKIE, cookie)
+        .send()?;
+    Ok(resp.text()?)
 }
 
 fn get_input(day: usize) -> String {
@@ -56,7 +102,12 @@ fn get_input(day: usize) -> String {
     .iter()
     .collect();
 
-    fs::read_to_string(input).unwrap()
+    if !input.exists() {
+        let s = download_input(day).unwrap();
+        fs::write(&input, s).expect("Unable to write inputs to file");
+    }
+
+    fs::read_to_string(input).expect("Unable to read inputs")
 }
 
 fn solve_problem(day: usize, part: Option<&str>) -> Result<()> {
@@ -65,14 +116,14 @@ fn solve_problem(day: usize, part: Option<&str>) -> Result<()> {
 
     match part {
         Some("1") => {
-            dbg!(problem.part_one(&input).unwrap());
+            println!("Part 1: {}", problem.part_one(&input).unwrap());
         }
         Some("2") => {
-            dbg!(problem.part_two(&input).unwrap());
+            println!("Part 2: {}", problem.part_two(&input).unwrap());
         }
         _ => {
-            dbg!(problem.part_one(&input).unwrap());
-            dbg!(problem.part_two(&input).unwrap());
+            println!("Part 1: {}", problem.part_one(&input).unwrap());
+            println!("Part 2: {}", problem.part_two(&input).unwrap());
         }
     };
 
