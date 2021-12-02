@@ -1,14 +1,15 @@
 use crate::problem::Problem;
+use serde_scan::scan;
 
 #[derive(Default)]
 pub struct DayTwo {}
 
 impl Problem for DayTwo {
     fn part_one(&self, input: &str) -> Option<String> {
-        let lines = input
+        let lines: Vec<(&str, usize)> = input
             .lines()
-            .map(|line| line.split_once(' ').unwrap())
-            .map(|(dir, mag)| (dir, mag.parse::<usize>().unwrap()));
+            .map(|line| scan!("{} {}" <- line).unwrap())
+            .collect();
         let mut depth = 0;
         let mut position = 0;
         for (dir, mag) in lines {
@@ -23,10 +24,10 @@ impl Problem for DayTwo {
     }
 
     fn part_two(&self, input: &str) -> Option<String> {
-        let lines = input
+        let lines: Vec<(&str, usize)> = input
             .lines()
-            .map(|line| line.split_once(' ').unwrap())
-            .map(|(dir, mag)| (dir, mag.parse::<usize>().unwrap()));
+            .map(|line| scan!("{} {}" <- line).unwrap())
+            .collect();
         let mut depth = 0;
         let mut position = 0;
         let mut aim = 0;
