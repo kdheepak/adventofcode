@@ -5,13 +5,10 @@ pub struct DayTwo {}
 
 impl Problem for DayTwo {
     fn part_one(&self, input: &str) -> Option<String> {
-        let lines = input.lines().map(|line| {
-            let mut i = line.split(' ');
-            (
-                i.next().unwrap(),
-                i.next().unwrap().parse::<usize>().unwrap(),
-            )
-        });
+        let lines = input
+            .lines()
+            .map(|line| line.split_once(' ').unwrap())
+            .map(|(dir, mag)| (dir, mag.parse::<usize>().unwrap()));
         let mut depth = 0;
         let mut position = 0;
         for (dir, mag) in lines {
@@ -34,13 +31,10 @@ impl Problem for DayTwo {
     }
 
     fn part_two(&self, input: &str) -> Option<String> {
-        let lines = input.lines().map(|line| {
-            let mut i = line.split(' ');
-            (
-                i.next().unwrap(),
-                i.next().unwrap().parse::<usize>().unwrap(),
-            )
-        });
+        let lines = input
+            .lines()
+            .map(|line| line.split_once(' ').unwrap())
+            .map(|(dir, mag)| (dir, mag.parse::<usize>().unwrap()));
         let mut depth = 0;
         let mut position = 0;
         let mut aim = 0;
