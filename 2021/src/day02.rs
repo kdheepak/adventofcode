@@ -13,18 +13,10 @@ impl Problem for DayTwo {
         let mut position = 0;
         for (dir, mag) in lines {
             match dir {
-                "forward" => {
-                    position += mag;
-                }
-                "down" => {
-                    depth += mag;
-                }
-                "up" => {
-                    depth -= mag;
-                }
-                _ => {
-                    panic!("unknown dir {}", dir)
-                }
+                "forward" => position += mag,
+                "down" => depth += mag,
+                "up" => depth -= mag,
+                _ => panic!("unknown dir {}", dir),
             }
         }
         Some((depth * position).to_string())
@@ -44,15 +36,9 @@ impl Problem for DayTwo {
                     position += mag;
                     depth += aim * mag;
                 }
-                "down" => {
-                    aim += mag;
-                }
-                "up" => {
-                    aim -= mag;
-                }
-                _ => {
-                    panic!("unknown dir {}", dir)
-                }
+                "down" => aim += mag,
+                "up" => aim -= mag,
+                _ => panic!("unknown dir {}", dir),
             }
         }
         Some((depth * position).to_string())
