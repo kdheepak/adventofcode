@@ -10,8 +10,7 @@ impl Problem for DayTwo {
             .lines()
             .map(|line| scan!("{} {}" <- line).unwrap())
             .collect();
-        let mut depth = 0;
-        let mut position = 0;
+        let (mut depth, mut position) = (0, 0);
         for (dir, mag) in lines {
             match dir {
                 "forward" => position += mag,
@@ -28,9 +27,7 @@ impl Problem for DayTwo {
             .lines()
             .map(|line| scan!("{} {}" <- line).unwrap())
             .collect();
-        let mut depth = 0;
-        let mut position = 0;
-        let mut aim = 0;
+        let (mut depth, mut position, mut aim) = (0, 0, 0);
         for (dir, mag) in lines {
             match dir {
                 "forward" => {
