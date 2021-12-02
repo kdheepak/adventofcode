@@ -6,6 +6,9 @@
 export ADVENTOFCODE_SESSION=xxx
 ```
 
+![Thanks to [Andrey Oskin](@Arkoniak) for the picture](https://user-images.githubusercontent.com/1813121/144458347-cac66dd4-9310-4aec-beaa-a696980374f9.png)
+
+
 ### Run
 
 ```bash
