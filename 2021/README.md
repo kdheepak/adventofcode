@@ -1,5 +1,11 @@
 # AOC2021
 
+### Setup
+
+```bash
+export ADVENTOFCODE_SESSION=xxx
+```
+
 ### Run
 
 ```bash
