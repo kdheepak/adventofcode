@@ -5,27 +5,28 @@ pub struct DayTwo {}
 
 impl Problem for DayTwo {
     fn part_one(&self, input: &str) -> Option<String> {
-        let lines = input.lines();
-
+        let lines = input.lines().map(|line| {
+            let mut i = line.split(' ');
+            (
+                i.next().unwrap(),
+                i.next().unwrap().parse::<usize>().unwrap(),
+            )
+        });
         let mut depth = 0;
         let mut position = 0;
-
-        for line in lines {
-            let s: Vec<&str> = line.split(' ').collect();
-            let dir = s[0];
-            let mag = s[1];
+        for (dir, mag) in lines {
             match dir {
                 "forward" => {
-                    position += mag.parse::<usize>().unwrap();
+                    position += mag;
                 }
                 "down" => {
-                    depth += mag.parse::<usize>().unwrap();
+                    depth += mag;
                 }
                 "up" => {
-                    depth -= mag.parse::<usize>().unwrap();
+                    depth -= mag;
                 }
                 _ => {
-                    panic!("unknown dir")
+                    panic!("unknown dir {}", dir)
                 }
             }
         }
@@ -33,29 +34,30 @@ impl Problem for DayTwo {
     }
 
     fn part_two(&self, input: &str) -> Option<String> {
-        let lines = input.lines();
-
+        let lines = input.lines().map(|line| {
+            let mut i = line.split(' ');
+            (
+                i.next().unwrap(),
+                i.next().unwrap().parse::<usize>().unwrap(),
+            )
+        });
         let mut depth = 0;
         let mut position = 0;
         let mut aim = 0;
-
-        for line in lines {
-            let s: Vec<&str> = line.split(' ').collect();
-            let dir = s[0];
-            let mag = s[1];
+        for (dir, mag) in lines {
             match dir {
                 "forward" => {
-                    position += mag.parse::<usize>().unwrap();
-                    depth += aim * mag.parse::<usize>().unwrap();
+                    position += mag;
+                    depth += aim * mag;
                 }
                 "down" => {
-                    aim += mag.parse::<usize>().unwrap();
+                    aim += mag;
                 }
                 "up" => {
-                    aim -= mag.parse::<usize>().unwrap();
+                    aim -= mag;
                 }
                 _ => {
-                    panic!("unknown dir")
+                    panic!("unknown dir {}", dir)
                 }
             }
         }
