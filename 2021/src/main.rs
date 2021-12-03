@@ -10,6 +10,7 @@ use std::path::{Path, PathBuf};
 
 use aoc2021::day01::DayOne;
 use aoc2021::day02::DayTwo;
+use aoc2021::day03::DayThree;
 
 use aoc2021::problem::Problem;
 
@@ -184,6 +185,7 @@ fn get_problem(day: usize) -> Option<Box<dyn Problem>> {
     match day {
         1 => Some(Box::new(DayOne::default())),
         2 => Some(Box::new(DayTwo::default())),
+        3 => Some(Box::new(DayThree::default())),
         _ => None,
     }
 }
