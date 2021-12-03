@@ -3,103 +3,46 @@ use crate::problem::Problem;
 #[derive(Default)]
 pub struct DayThree {}
 
-fn has_most_common_bit(bits: &Vec<Vec<usize>>, bit: usize) -> bool {
+fn has_most_common_bit(bits: &[usize], bit: usize) -> bool {
     let mut total = [0, 0];
     for item in bits {
-        if item[bit] == 1 {
-            total[0] += 1
+        total[(item >> bit) & 1] += 1;
+    }
+    total[1] >= total[0]
+}
+
+fn helper(input: &str, is_oxygen: bool) -> usize {
+    let n = input.lines().next().unwrap().chars().count();
+    let mut bits = input.lines().map(|item| usize::from_str_radix(item, 2).unwrap()).collect::<Vec<_>>();
+    for i in (0..n).rev() {
+        let keep = if is_oxygen {
+            has_most_common_bit(&bits, i) as usize
         } else {
-            total[1] += 1
+            !has_most_common_bit(&bits, i) as usize
+        };
+        bits.retain(|item| ((item >> i) & 1) == keep);
+        if bits.len() == 1 {
+            break;
         }
     }
-    total[0] >= total[1]
+
+    bits[0]
 }
 
 impl Problem for DayThree {
     fn part_one(&self, input: &str) -> Option<String> {
         let n = input.lines().next().unwrap().chars().count();
-        let mut lines = vec![0; n];
-        for line in input.lines() {
-            let bits = line
-                .chars()
-                .map(|c| c.to_string().parse::<usize>().unwrap())
-                .collect::<Vec<usize>>();
-            for (i, b) in bits.iter().enumerate() {
-                lines[i] += b;
-            }
-        }
+        let bits = input.lines().map(|item| usize::from_str_radix(item, 2).unwrap()).collect::<Vec<_>>();
 
-        let mut gamma = 0;
-        let mut epsilon = 0;
-
-        let base: i32 = 2;
-        for (i, b) in lines.iter().rev().enumerate() {
-            if *b > (input.lines().count() / 2) {
-                gamma += base.pow(i as u32);
-            } else {
-                epsilon += base.pow(i as u32);
-            }
-        }
-
+        let gamma: usize = (0..n).rev().map(|i| (has_most_common_bit(&bits, i) as usize) << i).sum();
+        let base: u32 = 2;
+        let epsilon = (!gamma) & (base.pow(n as u32) as usize - 1);
         Some((gamma * epsilon).to_string())
     }
 
     fn part_two(&self, input: &str) -> Option<String> {
-        let n = input.lines().next().unwrap().chars().count();
-
-        let mut bits = vec![];
-        for line in input.lines() {
-            bits.push(
-                line.chars()
-                    .map(|c| c.to_string().parse::<usize>().unwrap())
-                    .collect::<Vec<usize>>(),
-            );
-        }
-
-        for i in 0..n {
-            let keep = has_most_common_bit(&bits, i) as usize;
-            bits.retain(|item| item[i] == keep);
-            if bits.len() == 1 {
-                break;
-            }
-        }
-
-        let mut oxygen = 0;
-        let base: u32 = 2;
-        for (i, b) in bits[0].iter().rev().enumerate() {
-            if *b == 1 {
-                oxygen += base.pow(i as u32)
-            }
-        }
-
-        dbg!(oxygen);
-
-        let mut bits = vec![];
-        for line in input.lines() {
-            bits.push(
-                line.chars()
-                    .map(|c| c.to_string().parse::<usize>().unwrap())
-                    .collect::<Vec<usize>>(),
-            );
-        }
-
-        for i in 0..n {
-            let keep = has_most_common_bit(&bits, i) as usize;
-            bits.retain(|item| item[i] != keep);
-            if bits.len() == 1 {
-                break;
-            }
-        }
-        let mut co2 = 0;
-        let base: u32 = 2;
-        for (i, b) in bits[0].iter().rev().enumerate() {
-            if *b == 1 {
-                co2 += base.pow(i as u32)
-            }
-        }
-
-        dbg!(co2);
-
+        let oxygen = helper(input, true);
+        let co2 = helper(input, false);
         Some((oxygen * co2).to_string())
     }
 }
