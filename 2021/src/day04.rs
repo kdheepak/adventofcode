@@ -12,10 +12,10 @@ impl Board {
     fn is_bingo(&self) -> bool {
         for s in 0..5 {
             if self.0.row(s).iter().all(|x| x.1) {
-                return true
+                return true;
             }
             if self.0.column(s).iter().all(|x| x.1) {
-                return true
+                return true;
             }
         }
         false
@@ -31,27 +31,26 @@ impl Board {
         let s = self.0.iter().filter(|x| !x.1).map(|x| x.0).sum::<usize>();
         s * draw
     }
-
 }
 
 fn parse_input(input: &str) -> (Vec<usize>, Vec<Board>) {
     let mut s = input.split("\n\n");
-    let draws = s.next().unwrap()
-            .split(',')
-            .filter(|n| !n.is_empty())
-            .map(|n| n.parse::<usize>().unwrap())
-            .collect::<Vec<usize>>();
-    let boards = s.map(|b|
-        Board{0: Matrix5::from_iterator(
-            b
-            .lines()
-            .flat_map(|l|
+    let draws = s
+        .next()
+        .unwrap()
+        .split(',')
+        .filter(|n| !n.is_empty())
+        .map(|n| n.parse::<usize>().unwrap())
+        .collect::<Vec<usize>>();
+    let boards = s
+        .map(|b| Board {
+            0: Matrix5::from_iterator(b.lines().flat_map(|l| {
                 l.split_whitespace()
-                .filter_map(|i| i.parse::<usize>().ok())
-                .map(|x| (x, false))
-            )
-        )}
-    ).collect();
+                    .filter_map(|i| i.parse::<usize>().ok())
+                    .map(|x| (x, false))
+            })),
+        })
+        .collect();
     (draws, boards)
 }
 
@@ -76,13 +75,13 @@ impl Problem for Day04 {
         for draw in draws {
             for (i, board) in boards.iter_mut().enumerate() {
                 if won_boards[i] {
-                    continue
+                    continue;
                 }
                 board.update(draw);
                 if board.is_bingo() {
                     won_boards[i] = true;
                     if won_boards.iter().all(|x| *x) {
-                        return Some(board.calculate_score(draw).to_string())
+                        return Some(board.calculate_score(draw).to_string());
                     }
                 }
             }
