@@ -1,7 +1,11 @@
 use crate::problem::Problem;
 
+use itertools::Itertools;
+
 #[derive(Default)]
 pub struct Day04 {}
+
+type Board = Vec<Vec<usize>>;
 
 fn check_selected(selected: &[(usize, usize, usize)], last: (usize, usize, usize, usize)) -> bool {
     let (board, row, col, _) = last;
@@ -44,34 +48,24 @@ fn calculate_score(
     total
 }
 
-impl Problem for Day04 {
-    fn part_one(&self, input: &str) -> Option<String> {
-        let mut lines = input.lines();
-        let sequence = lines
-            .next()
-            .unwrap()
+fn parse_input(input: &str) -> (Vec<usize>, Vec<Board>) {
+    let mut s = input.split("\n\n");
+    let sequence = s.next().unwrap()
             .split(',')
             .filter(|n| !n.is_empty())
             .map(|n| n.parse::<usize>().unwrap())
             .collect::<Vec<usize>>();
+    let boards = s.map(|b|
+        b.lines()
+        .map(|l| l.split_whitespace().map(|i| i.parse::<usize>().unwrap()).collect())
+        .collect()
+    ).collect();
+    (sequence, boards)
+}
 
-        lines.next().unwrap();
-        let mut boards = vec![];
-        let mut board = vec![];
-        for line in lines {
-            if line.is_empty() {
-                boards.push(board);
-                board = vec![];
-            } else {
-                board.push(
-                    line.split(' ')
-                        .filter(|n| !n.is_empty())
-                        .map(|n| n.parse::<usize>().unwrap())
-                        .collect::<Vec<usize>>(),
-                );
-            }
-        }
-        boards.push(board);
+impl Problem for Day04 {
+    fn part_one(&self, input: &str) -> Option<String> {
+        let (sequence, boards) = parse_input(input);
 
         let mut selected = vec![];
         for s in sequence.iter() {
@@ -97,33 +91,7 @@ impl Problem for Day04 {
     }
 
     fn part_two(&self, input: &str) -> Option<String> {
-        let mut lines = input.lines();
-        let sequence = lines
-            .next()
-            .unwrap()
-            .split(',')
-            .filter(|n| !n.is_empty())
-            .map(|n| n.parse::<usize>().unwrap())
-            .collect::<Vec<usize>>();
-
-        lines.next().unwrap();
-        let mut boards = vec![];
-        let mut board = vec![];
-        for line in lines {
-            if line.is_empty() {
-                boards.push(board);
-                board = vec![];
-            } else {
-                board.push(
-                    line.split(' ')
-                        .filter(|n| !n.is_empty())
-                        .map(|n| n.parse::<usize>().unwrap())
-                        .collect::<Vec<usize>>(),
-                );
-            }
-        }
-        boards.push(board);
-
+        let (sequence, boards) = parse_input(input);
         let mut selected = vec![];
         let mut skip_boards = vec![];
         let mut last_called = 0;
