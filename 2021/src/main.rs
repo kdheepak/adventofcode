@@ -4,17 +4,7 @@
 
 use anyhow::{anyhow, Result};
 use clap::{crate_authors, crate_description, crate_license, crate_name, crate_version, App, Arg};
-use std::time::Instant;
-
-use std::fs;
-use std::path::{Path, PathBuf};
-
-use aoc2021::day01::DayOne;
-use aoc2021::day02::DayTwo;
-use aoc2021::day03::DayThree;
-use aoc2021::day04::Day04;
-
-use aoc2021::problem::Problem;
+use aoc2021::*;
 
 pub fn generate_cli_app() -> App<'static> {
     let app = App::new(crate_name!())
@@ -139,89 +129,4 @@ fn main() -> Result<()> {
         _ => {}
     }
     Ok(())
-}
-
-fn download_input(day: usize) -> Result<String> {
-    let client = make_client();
-    let url = format!("https://adventofcode.com/2021/day/{}/input", day);
-    let resp = client.get(url.as_str()).send()?;
-    Ok(resp.text()?)
-}
-
-fn submit_solution(day: usize, level: usize, answer: String) -> Result<String> {
-    let client = make_client();
-    let url = format!("https://adventofcode.com/2021/day/{}/answer", day);
-    let mut params = std::collections::HashMap::new();
-    params.insert("level", level.to_string());
-    params.insert("answer", answer);
-    dbg!(&params);
-    let resp = client.post(url).form(&params).send()?;
-    dbg!(&resp);
-    Ok(resp.text()?)
-}
-
-fn make_client() -> reqwest::blocking::Client {
-    let mut headers = reqwest::header::HeaderMap::default();
-    let cookie = reqwest::header::HeaderValue::from_str(
-        format!("session={}", env!("ADVENTOFCODE_SESSION")).as_str(),
-    )
-    .unwrap();
-    headers.insert("Cookie", cookie);
-    reqwest::blocking::Client::builder()
-        .default_headers(headers)
-        .build()
-        .unwrap()
-}
-
-fn get_input(day: usize) -> String {
-    let input: PathBuf = [
-        env!("CARGO_MANIFEST_DIR"),
-        format!("inputs/day{:02}.txt", day).as_str(),
-    ]
-    .iter()
-    .collect();
-
-    if !input.exists() {
-        let s = download_input(day).unwrap();
-        fs::write(&input, s).expect("Unable to write inputs to file");
-    }
-
-    fs::read_to_string(input).expect("Unable to read inputs")
-}
-
-fn solve_problem(day: usize, part: usize) -> Result<String> {
-    let input = get_input(day);
-    let problem = get_problem(day).expect("Unable to create problem.");
-
-    match part {
-        1 => Ok(problem.part_one(&input).unwrap()),
-        2 => Ok(problem.part_two(&input).unwrap()),
-        _ => Err(anyhow!("Unable to solve for part {}", part)),
-    }
-}
-
-fn benchmark_problem(days: Vec<usize>) {
-    for day in days {
-        println!("Day {:02}:", day);
-        let input = get_input(day);
-        let problem = get_problem(day).expect("Unable to create problem.");
-        let now = Instant::now();
-        let answer = problem.part_one(&input).unwrap();
-        let elapsed = now.elapsed();
-        println!("    Part 1 [{:08.2?}]: {}", elapsed, answer);
-        let now = Instant::now();
-        let answer = problem.part_two(&input).unwrap();
-        let elapsed = now.elapsed();
-        println!("    Part 2 [{:08.2?}]: {}", elapsed, answer);
-    }
-}
-
-fn get_problem(day: usize) -> Option<Box<dyn Problem>> {
-    match day {
-        1 => Some(Box::new(DayOne::default())),
-        2 => Some(Box::new(DayTwo::default())),
-        3 => Some(Box::new(DayThree::default())),
-        4 => Some(Box::new(Day04::default())),
-        _ => None,
-    }
 }

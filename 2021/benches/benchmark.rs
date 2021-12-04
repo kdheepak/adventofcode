@@ -1,0 +1,14 @@
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use aoc2021::*;
+
+fn criterion_benchmark(c: &mut Criterion) {
+    for day in &[1, 2, 3, 4] {
+        let input = get_input(*day);
+        let problem = get_problem(*day).expect("Unable to create problem.");
+        c.bench_function(format!("Day {:02} part 1", day).as_str(), |b| b.iter(|| problem.part_one(black_box(&input)).unwrap()));
+        c.bench_function(format!("Day {:02} part 2", day).as_str(), |b| b.iter(|| problem.part_one(black_box(&input)).unwrap()));
+    }
+}
+
+criterion_group!(benches, criterion_benchmark);
+criterion_main!(benches);
