@@ -2,6 +2,7 @@
 #![allow(unused_imports)]
 #![allow(unused_variables)]
 
+use std::time::Instant;
 use anyhow::{anyhow, Result};
 use clap::{crate_authors, crate_description, crate_license, crate_name, crate_version, App, Arg};
 
@@ -41,6 +42,16 @@ pub fn generate_cli_app() -> App<'static> {
                         .max_values(1)
                         .min_values(1),
                 ),
+        )
+        .subcommand(
+            App::new("benchmark")
+                .arg(
+                    Arg::new("days")
+                        .short('d')
+                        .long("days")
+                        .takes_value(true)
+                        .multiple_values(true),
+                )
         )
         .subcommand(
             App::new("solve")
@@ -118,6 +129,14 @@ fn main() -> Result<()> {
             let answer = solve_problem(day, part)?;
             println!("Day {:02} Part {} : {}", day, part, answer);
         }
+        Some(("benchmark", matches)) => {
+            let days = matches
+                .values_of("days")
+                .expect("Expected valid day command line input")
+                .map(|x| x.parse::<_>().expect("Unable to parse input day"))
+                .collect();
+            benchmark_problem(days);
+        }
         _ => {}
     }
     Ok(())
@@ -179,6 +198,21 @@ fn solve_problem(day: usize, part: usize) -> Result<String> {
         1 => Ok(problem.part_one(&input).unwrap()),
         2 => Ok(problem.part_two(&input).unwrap()),
         _ => Err(anyhow!("Unable to solve for part {}", part)),
+    }
+}
+
+fn benchmark_problem(days: Vec<usize>) {
+    for day in days {
+        let input = get_input(day);
+        let problem = get_problem(day).expect("Unable to create problem.");
+        let now = Instant::now();
+        let answer = problem.part_one(&input).unwrap();
+        let elapsed = now.elapsed();
+        println!("Day {:02} Part 1 [{:08.2?}]: {}", day, elapsed, answer);
+        let now = Instant::now();
+        let answer = problem.part_two(&input).unwrap();
+        let elapsed = now.elapsed();
+        println!("Day {:02} Part 2 [{:08.2?}]: {}", day, elapsed, answer);
     }
 }
 
