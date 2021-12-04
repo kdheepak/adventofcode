@@ -13,7 +13,10 @@ fn has_most_common_bit(bits: &[usize], bit: usize) -> bool {
 
 fn helper(input: &str, is_oxygen: bool) -> usize {
     let n = input.lines().next().unwrap().chars().count();
-    let mut bits = input.lines().map(|item| usize::from_str_radix(item, 2).unwrap()).collect::<Vec<_>>();
+    let mut bits = input
+        .lines()
+        .map(|item| usize::from_str_radix(item, 2).unwrap())
+        .collect::<Vec<_>>();
     for i in (0..n).rev() {
         let keep = if is_oxygen {
             has_most_common_bit(&bits, i) as usize
@@ -32,9 +35,15 @@ fn helper(input: &str, is_oxygen: bool) -> usize {
 impl Problem for DayThree {
     fn part_one(&self, input: &str) -> Option<String> {
         let n = input.lines().next().unwrap().chars().count();
-        let bits = input.lines().map(|item| usize::from_str_radix(item, 2).unwrap()).collect::<Vec<_>>();
+        let bits = input
+            .lines()
+            .map(|item| usize::from_str_radix(item, 2).unwrap())
+            .collect::<Vec<_>>();
 
-        let gamma: usize = (0..n).rev().map(|i| (has_most_common_bit(&bits, i) as usize) << i).sum();
+        let gamma: usize = (0..n)
+            .rev()
+            .map(|i| (has_most_common_bit(&bits, i) as usize) << i)
+            .sum();
         let base: u32 = 2;
         let epsilon = (!gamma) & (base.pow(n as u32) as usize - 1);
         Some((gamma * epsilon).to_string())
