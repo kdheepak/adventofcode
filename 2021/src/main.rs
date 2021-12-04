@@ -202,16 +202,17 @@ fn solve_problem(day: usize, part: usize) -> Result<String> {
 
 fn benchmark_problem(days: Vec<usize>) {
     for day in days {
+        println!("Day {:02}:", day);
         let input = get_input(day);
         let problem = get_problem(day).expect("Unable to create problem.");
         let now = Instant::now();
         let answer = problem.part_one(&input).unwrap();
         let elapsed = now.elapsed();
-        println!("Day {:02} Part 1 [{:08.2?}]: {}", day, elapsed, answer);
+        println!("    Part 1 [{:08.2?}]: {}", elapsed, answer);
         let now = Instant::now();
         let answer = problem.part_two(&input).unwrap();
         let elapsed = now.elapsed();
-        println!("Day {:02} Part 2 [{:08.2?}]: {}", day, elapsed, answer);
+        println!("    Part 2 [{:08.2?}]: {}", elapsed, answer);
     }
 }
 
