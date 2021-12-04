@@ -2,9 +2,9 @@
 #![allow(unused_imports)]
 #![allow(unused_variables)]
 
-use std::time::Instant;
 use anyhow::{anyhow, Result};
 use clap::{crate_authors, crate_description, crate_license, crate_name, crate_version, App, Arg};
+use std::time::Instant;
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -44,14 +44,13 @@ pub fn generate_cli_app() -> App<'static> {
                 ),
         )
         .subcommand(
-            App::new("benchmark")
-                .arg(
-                    Arg::new("days")
-                        .short('d')
-                        .long("days")
-                        .takes_value(true)
-                        .multiple_values(true),
-                )
+            App::new("benchmark").arg(
+                Arg::new("days")
+                    .short('d')
+                    .long("days")
+                    .takes_value(true)
+                    .multiple_values(true),
+            ),
         )
         .subcommand(
             App::new("solve")
