@@ -1,123 +1,93 @@
 use crate::problem::Problem;
 
-use itertools::Itertools;
-
 #[derive(Default)]
 pub struct Day04 {}
 
-type Board = Vec<Vec<usize>>;
+use nalgebra::Matrix5;
 
-fn check_selected(selected: &[(usize, usize, usize)], last: (usize, usize, usize, usize)) -> bool {
-    let (board, row, col, _) = last;
+#[derive(Debug, Copy, Clone)]
+struct Board(Matrix5<(usize, bool)>);
 
-    let mut bingo = vec![];
-    let rem = row % 5;
-    for r in (row - rem)..(row - rem + 5) {
-        bingo.push(selected.contains(&(board, r, col)))
-    }
-    if bingo.iter().all(|x| *x) {
-        return true;
-    }
-    let mut bingo = vec![];
-    let rem = col % 5;
-    for c in (col - rem)..(col - rem + 5) {
-        bingo.push(selected.contains(&(board, row, c)))
-    }
-    if bingo.iter().all(|x| *x) {
-        return true;
+impl Board {
+    fn is_bingo(&self) -> bool {
+        for s in 0..5 {
+            if self.0.row(s).iter().all(|x| x.1) {
+                return true
+            }
+            if self.0.column(s).iter().all(|x| x.1) {
+                return true
+            }
+        }
+        false
     }
 
-    false
-}
-
-fn calculate_score(
-    board: &[Vec<usize>],
-    selected: &[(usize, usize, usize)],
-    board_number: usize,
-) -> usize {
-    let mut board = board.to_owned();
-    for (board_id, row, col) in selected {
-        if *board_id == board_number {
-            board[*row][*col] = 0;
+    fn update(&mut self, draw: usize) {
+        if let Some(i) = self.0.iter().position(|x| x.0 == draw) {
+            self.0[i] = (draw, true)
         }
     }
-    let mut total = 0;
-    for row in board {
-        total += row.iter().sum::<usize>();
+
+    fn calculate_score(&self, draw: usize) -> usize {
+        let s = self.0.iter().filter(|x| !x.1).map(|x| x.0).sum::<usize>();
+        s * draw
     }
-    total
+
 }
 
 fn parse_input(input: &str) -> (Vec<usize>, Vec<Board>) {
     let mut s = input.split("\n\n");
-    let sequence = s.next().unwrap()
+    let draws = s.next().unwrap()
             .split(',')
             .filter(|n| !n.is_empty())
             .map(|n| n.parse::<usize>().unwrap())
             .collect::<Vec<usize>>();
     let boards = s.map(|b|
-        b.lines()
-        .map(|l| l.split_whitespace().map(|i| i.parse::<usize>().unwrap()).collect())
-        .collect()
+        Board{0: Matrix5::from_iterator(
+            b
+            .lines()
+            .flat_map(|l|
+                l.split_whitespace()
+                .filter_map(|i| i.parse::<usize>().ok())
+                .map(|x| (x, false))
+            )
+        )}
     ).collect();
-    (sequence, boards)
+    (draws, boards)
 }
 
 impl Problem for Day04 {
     fn part_one(&self, input: &str) -> Option<String> {
-        let (sequence, boards) = parse_input(input);
+        let (draws, mut boards) = parse_input(input);
 
-        let mut selected = vec![];
-        for s in sequence.iter() {
-            for (board_number, board) in boards.iter().enumerate() {
-                for (row_number, row) in board.iter().enumerate() {
-                    for (col_number, val) in row.iter().enumerate() {
-                        if val == s {
-                            selected.push((board_number, row_number, col_number));
-                            if check_selected(&selected, (board_number, row_number, col_number, *s))
-                            {
-                                dbg!("bingo");
-                                let s =
-                                    calculate_score(&boards[board_number], &selected, board_number);
-                                return Some((s * *val).to_string());
-                            }
-                        }
-                    }
+        for draw in draws {
+            for board in boards.iter_mut() {
+                board.update(draw);
+                if board.is_bingo() {
+                    return Some(board.calculate_score(draw).to_string());
                 }
             }
         }
-
-        None
+        unreachable!()
     }
 
     fn part_two(&self, input: &str) -> Option<String> {
-        let (sequence, boards) = parse_input(input);
-        let mut selected = vec![];
-        let mut skip_boards = vec![];
-        let mut last_called = 0;
-        for s in sequence.iter() {
-            for (board_number, board) in boards.iter().enumerate() {
-                if skip_boards.contains(&board_number) {
-                    continue;
+        let (draws, mut boards) = parse_input(input);
+        let mut won_boards = vec![false; boards.len()];
+        for draw in draws {
+            for (i, board) in boards.iter_mut().enumerate() {
+                if won_boards[i] {
+                    continue
                 }
-                for (row_number, row) in board.iter().enumerate() {
-                    for (col_number, val) in row.iter().enumerate() {
-                        if val == s {
-                            selected.push((board_number, row_number, col_number));
-                            if check_selected(&selected, (board_number, row_number, col_number, *s))
-                            {
-                                dbg!("bingo");
-                                skip_boards.push(board_number);
-                                last_called = *s;
-                            }
-                        }
+                board.update(draw);
+                if board.is_bingo() {
+                    won_boards[i] = true;
+                    if won_boards.iter().all(|x| *x) {
+                        return Some(board.calculate_score(draw).to_string())
                     }
                 }
             }
         }
-        let board_number = skip_boards.last().unwrap();
-        let s = calculate_score(&boards[*board_number], &selected, *board_number);
-        Some((s * last_called).to_string())
+        unreachable!()
     }
 }
 
