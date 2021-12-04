@@ -14,9 +14,9 @@ use problem::Problem;
 
 use std::time::Instant;
 
+use anyhow::{anyhow, Result};
 use std::fs;
 use std::path::PathBuf;
-use anyhow::{anyhow, Result};
 
 fn make_client() -> reqwest::blocking::Client {
     let mut headers = reqwest::header::HeaderMap::default();

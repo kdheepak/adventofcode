@@ -3,8 +3,8 @@
 #![allow(unused_variables)]
 
 use anyhow::{anyhow, Result};
-use clap::{crate_authors, crate_description, crate_license, crate_name, crate_version, App, Arg};
 use aoc2021::*;
+use clap::{crate_authors, crate_description, crate_license, crate_name, crate_version, App, Arg};
 
 pub fn generate_cli_app() -> App<'static> {
     let app = App::new(crate_name!())
