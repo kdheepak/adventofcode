@@ -67,8 +67,8 @@ pub fn solve_problem(day: usize, part: usize) -> Result<String> {
     let problem = get_problem(day).expect("Unable to create problem.");
 
     match part {
-        1 => Ok(problem.part_one(&input).unwrap()),
-        2 => Ok(problem.part_two(&input).unwrap()),
+        1 => Ok(problem.part1(&input).unwrap()),
+        2 => Ok(problem.part2(&input).unwrap()),
         _ => Err(anyhow!("Unable to solve for part {}", part)),
     }
 }
@@ -79,11 +79,11 @@ pub fn benchmark_problem(days: Vec<usize>) {
         let input = get_input(day);
         let problem = get_problem(day).expect("Unable to create problem.");
         let now = Instant::now();
-        let answer = problem.part_one(&input).unwrap();
+        let answer = problem.part1(&input).unwrap();
         let elapsed = now.elapsed();
         println!("    Part 1 [{:09.2?}]: {}", elapsed, answer);
         let now = Instant::now();
-        let answer = problem.part_two(&input).unwrap();
+        let answer = problem.part2(&input).unwrap();
         let elapsed = now.elapsed();
         println!("    Part 2 [{:09.2?}]: {}", elapsed, answer);
     }

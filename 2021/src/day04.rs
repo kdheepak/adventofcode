@@ -55,7 +55,7 @@ fn parse_input(input: &str) -> (Vec<usize>, Vec<Board>) {
 }
 
 impl Problem for Day04 {
-    fn part_one(&self, input: &str) -> Option<String> {
+    fn part1(&self, input: &str) -> Option<String> {
         let (draws, mut boards) = parse_input(input);
 
         for draw in draws {
@@ -69,7 +69,7 @@ impl Problem for Day04 {
         unreachable!()
     }
 
-    fn part_two(&self, input: &str) -> Option<String> {
+    fn part2(&self, input: &str) -> Option<String> {
         let (draws, mut boards) = parse_input(input);
         let mut won_boards = vec![false; boards.len()];
         for draw in draws {
@@ -112,5 +112,5 @@ fn test_day04_part1() {
 22 11 13  6  5
  2  0 12  3  7"#;
     let prob = Day04 {};
-    dbg!(prob.part_one(&input));
+    dbg!(prob.part1(&input));
 }

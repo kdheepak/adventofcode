@@ -4,7 +4,7 @@ use crate::problem::Problem;
 pub struct Day01 {}
 
 impl Problem for Day01 {
-    fn part_one(&self, input: &str) -> Option<String> {
+    fn part1(&self, input: &str) -> Option<String> {
         let ans = input
             .split_whitespace()
             .map(|line| line.parse::<usize>().unwrap())
@@ -15,7 +15,7 @@ impl Problem for Day01 {
         Some(ans.to_string())
     }
 
-    fn part_two(&self, input: &str) -> Option<String> {
+    fn part2(&self, input: &str) -> Option<String> {
         let ans = input
             .split_whitespace()
             .map(|line| line.parse::<usize>().unwrap())

@@ -5,7 +5,7 @@ use serde_scan::scan;
 pub struct Day02 {}
 
 impl Problem for Day02 {
-    fn part_one(&self, input: &str) -> Option<String> {
+    fn part1(&self, input: &str) -> Option<String> {
         let lines: Vec<(&str, usize)> = input
             .lines()
             .map(|line| scan!("{} {}" <- line).unwrap())
@@ -22,7 +22,7 @@ impl Problem for Day02 {
         Some((depth * position).to_string())
     }
 
-    fn part_two(&self, input: &str) -> Option<String> {
+    fn part2(&self, input: &str) -> Option<String> {
         let lines: Vec<(&str, usize)> = input
             .lines()
             .map(|line| scan!("{} {}" <- line).unwrap())

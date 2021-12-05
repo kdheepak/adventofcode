@@ -33,7 +33,7 @@ fn helper(input: &str, is_oxygen: bool) -> usize {
 }
 
 impl Problem for Day03 {
-    fn part_one(&self, input: &str) -> Option<String> {
+    fn part1(&self, input: &str) -> Option<String> {
         let n = input.lines().next().unwrap().chars().count();
         let bits = input
             .lines()
@@ -49,7 +49,7 @@ impl Problem for Day03 {
         Some((gamma * epsilon).to_string())
     }
 
-    fn part_two(&self, input: &str) -> Option<String> {
+    fn part2(&self, input: &str) -> Option<String> {
         let oxygen = helper(input, true);
         let co2 = helper(input, false);
         Some((oxygen * co2).to_string())
@@ -57,9 +57,9 @@ impl Problem for Day03 {
 }
 
 #[test]
-fn test_day_three_part_one() {
+fn test_day03_part1() {
     let prob = Day03 {};
-    let ans = prob.part_one(
+    let ans = prob.part1(
         r#"00100
 11110
 10110
@@ -77,9 +77,9 @@ fn test_day_three_part_one() {
 }
 
 #[test]
-fn test_day_three_part_two() {
+fn test_day03_part2() {
     let prob = Day03 {};
-    let ans = prob.part_two(
+    let ans = prob.part2(
         r#"00100
 11110
 10110
