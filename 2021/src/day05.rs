@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use itertools::Itertools;
+use nalgebra::DMatrix;
 
 use crate::problem::Problem;
 
@@ -21,7 +22,14 @@ impl Day05 {
       })
       .collect();
 
-    let mut map = HashMap::new();
+    let size = lines
+      .iter()
+      .flat_map(|d| vec![d.0, d.1, d.2, d.3])
+      .reduce(std::cmp::max)
+      .unwrap()
+      + 1;
+
+    let mut map = DMatrix::<usize>::zeros(size as usize, size as usize);
 
     for d in lines.iter().filter(|d| diag || !(d.0 != d.2 && d.1 != d.3)) {
       let (x1, y1, x2, y2) = (d.0, d.1, d.2, d.3);
@@ -29,12 +37,12 @@ impl Day05 {
       let dy = (y2 - y1).signum();
       let (mut x, mut y) = (x1, y1);
       while (x, y) != (x2 + dx, y2 + dy) {
-        *map.entry((x as usize, y as usize)).or_insert(0) += 1;
+        *map.get_mut((x as usize, y as usize)).unwrap() += 1;
         x += dx;
         y += dy;
       }
     }
-    Some((map.values().filter(|v| **v > 1).count()).to_string())
+    Some((map.iter().filter(|v| **v > 1).count()).to_string())
   }
 }
 
