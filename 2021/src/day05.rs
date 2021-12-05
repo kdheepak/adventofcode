@@ -16,7 +16,7 @@ impl Day05 {
         l.split(" -> ")
           .map(|s| s.split(','))
           .flatten()
-          .map(|i| i.parse::<i64>().unwrap())
+          .map(|i| i.parse().unwrap())
           .collect_tuple()
       })
       .collect();
