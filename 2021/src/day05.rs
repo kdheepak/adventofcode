@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use nalgebra::dmatrix;
+use nalgebra::DMatrix;
 
 use crate::problem::Problem;
 
@@ -27,7 +27,7 @@ impl Day05 {
       .unwrap()
       + 1;
 
-    let mut map = dmatrix![0; size as usize];
+    let mut map = DMatrix::<usize>::zeros(size as usize, size as usize);
 
     for d in lines.iter().filter(|d| diag || !(d.0 != d.2 && d.1 != d.3)) {
       let (x1, y1, x2, y2) = (d.0, d.1, d.2, d.3);
