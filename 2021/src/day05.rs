@@ -16,16 +16,12 @@ struct Line {
 }
 
 impl Day05 {
-  fn parse(&self, input: &str) -> Vec<Line> {
-    input
+  fn helper(&self, input: &str, diag: bool) -> Option<String> {
+    let lines: Vec<Line> = input
       .lines()
       .map(|l| scan!("{},{} -> {},{}" <- l).unwrap())
       .map(|(x1, y1, x2, y2)| Line { x1, y1, x2, y2 })
-      .collect()
-  }
-
-  fn helper(&self, input: &str, diag: bool) -> Option<String> {
-    let lines = self.parse(input);
+      .collect();
 
     let size = lines
       .iter()
