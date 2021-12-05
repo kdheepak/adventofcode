@@ -36,17 +36,17 @@ mod tests {
   #[test]
   fn test_day01_part1() {
     let input = indoc! {"
-            199
-            200
-            208
-            210
-            200
-            207
-            240
-            269
-            260
-            263
-        "};
+      199
+      200
+      208
+      210
+      200
+      207
+      240
+      269
+      260
+      263
+    "};
     let prob = Day01 {};
 
     assert_eq!(prob.part1(input), Some("7".to_string()));
@@ -57,17 +57,17 @@ mod tests {
   #[test]
   fn test_day01_part2() {
     let input = indoc! {"
-            199
-            200
-            208
-            210
-            200
-            207
-            240
-            269
-            260
-            263
-        "};
+      199
+      200
+      208
+      210
+      200
+      207
+      240
+      269
+      260
+      263
+    "};
     let prob = Day01 {};
 
     assert_eq!(prob.part2(input), Some("5".to_string()));

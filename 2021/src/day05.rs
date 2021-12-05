@@ -93,7 +93,7 @@ mod tests {
         0,0 -> 8,8
         5,5 -> 8,2
     "};
-    assert_eq!(prob.part2(input), Some("5".to_string()));
+    assert_eq!(prob.part1(input), Some("5".to_string()));
 
     assert_eq!(prob.part1(&crate::get_input(5)), Some("5690".to_string()));
   }

@@ -47,34 +47,34 @@ mod tests {
   #[test]
   fn test_day02_part1() {
     let input = indoc! {"
-            forward 5
-            down 5
-            forward 8
-            up 3
-            down 8
-            forward 2
-        "};
+      forward 5
+      down 5
+      forward 8
+      up 3
+      down 8
+      forward 2
+    "};
     let prob = Day02 {};
 
     assert_eq!(prob.part1(input), Some("150".to_string()));
 
-    assert_eq!(prob.part1(&crate::get_input(1)), Some("1480518".to_string()));
+    assert_eq!(prob.part1(&crate::get_input(2)), Some("1480518".to_string()));
   }
 
   #[test]
   fn test_day02_part2() {
     let input = indoc! {"
-            forward 5
-            down 5
-            forward 8
-            up 3
-            down 8
-            forward 2
-        "};
+      forward 5
+      down 5
+      forward 8
+      up 3
+      down 8
+      forward 2
+    "};
     let prob = Day02 {};
 
     assert_eq!(prob.part2(input), Some("900".to_string()));
 
-    assert_eq!(prob.part2(&crate::get_input(1)), Some("1282809906".to_string()));
+    assert_eq!(prob.part2(&crate::get_input(2)), Some("1282809906".to_string()));
   }
 }
