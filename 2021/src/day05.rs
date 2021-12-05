@@ -1,19 +1,12 @@
-use std::cmp::max;
+use std::collections::HashMap;
 
 use itertools::Itertools;
-use nalgebra::DMatrix;
 
 use crate::problem::Problem;
 
 #[derive(Default)]
 pub struct Day05 {}
-
-struct Line {
-  x1: i64,
-  y1: i64,
-  x2: i64,
-  y2: i64,
-}
+type Line = (i64, i64, i64, i64);
 
 impl Day05 {
   fn helper(&self, input: &str, diag: bool) -> Option<String> {
@@ -26,32 +19,22 @@ impl Day05 {
           .map(|i| i.parse::<i64>().unwrap())
           .collect_tuple()
       })
-      .map(|(x1, y1, x2, y2)| Line { x1, y1, x2, y2 })
       .collect();
 
-    let size = lines
-      .iter()
-      .flat_map(|d| vec![d.x1, d.x2, d.y1, d.y2].into_iter())
-      .reduce(max)
-      .unwrap()
-      + 1;
+    let mut map = HashMap::new();
 
-    let mut map: DMatrix<usize> = DMatrix::zeros(size as usize, size as usize);
-
-    for d in lines.iter().filter(|d| diag || !(d.x1 != d.x2 && d.y1 != d.y2)) {
-      let Line { x1, y1, x2, y2 } = d;
+    for d in lines.iter().filter(|d| diag || !(d.0 != d.2 && d.1 != d.3)) {
+      let (x1, y1, x2, y2) = (d.0, d.1, d.2, d.3);
       let dx = (x2 - x1).signum();
       let dy = (y2 - y1).signum();
-      let (mut x, mut y) = (*x1, *y1);
-      while (x, y) != (*x2 + dx, *y2 + dy) {
-        *map
-          .get_mut((x as usize, y as usize))
-          .unwrap_or_else(|| panic!("Cannot index {:?}", (x, y))) += 1;
+      let (mut x, mut y) = (x1, y1);
+      while (x, y) != (x2 + dx, y2 + dy) {
+        *map.entry((x as usize, y as usize)).or_insert(0) += 1;
         x += dx;
         y += dy;
       }
     }
-    Some((map.iter().filter(|v| **v > 1).count()).to_string())
+    Some((map.values().filter(|v| **v > 1).count()).to_string())
   }
 }
 
