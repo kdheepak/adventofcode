@@ -10,7 +10,7 @@ pub mod problem;
 
 use std::{fs, path::PathBuf, time::Instant};
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 use problem::Problem;
 
 fn make_client() -> reqwest::blocking::Client {
@@ -28,7 +28,11 @@ pub fn download_input(day: usize) -> Result<String> {
   let client = make_client();
   let url = format!("https://adventofcode.com/2021/day/{}/input", day);
   let resp = client.get(url.as_str()).send()?;
-  Ok(resp.text()?)
+  if resp.status().is_success() {
+    Ok(resp.text()?)
+  } else {
+    Err(anyhow!(resp.text()?))
+  }
 }
 
 pub fn submit_solution(day: usize, level: usize, answer: String) -> Result<String> {
@@ -49,7 +53,9 @@ pub fn get_input(day: usize) -> String {
     .collect();
 
   if !input.exists() {
-    let s = download_input(day).unwrap();
+    let s = download_input(day)
+      .with_context(|| format!("Unable to download input for day {:02}.", day))
+      .unwrap();
     fs::write(&input, s).expect("Unable to write inputs to file");
   }
 
