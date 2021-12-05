@@ -2,13 +2,9 @@ pub mod day01;
 pub mod day02;
 pub mod day03;
 pub mod day04;
+pub mod day05;
 
 pub mod problem;
-
-use day01::Day01;
-use day02::Day02;
-use day03::Day03;
-use day04::Day04;
 
 use problem::Problem;
 
@@ -45,9 +41,9 @@ pub fn submit_solution(day: usize, level: usize, answer: String) -> Result<Strin
     params.insert("level", level.to_string());
     params.insert("answer", answer);
     dbg!(&params);
-    let resp = client.post(url).form(&params).send()?;
-    dbg!(&resp);
-    Ok(resp.text()?)
+    let html = client.post(url).form(&params).send()?.text()?;
+    let plaintext = html2text::from_read(std::io::BufReader::new(html.as_bytes()), 80);
+    Ok(plaintext)
 }
 
 pub fn get_input(day: usize) -> String {
@@ -85,20 +81,21 @@ pub fn benchmark_problem(days: Vec<usize>) {
         let now = Instant::now();
         let answer = problem.part_one(&input).unwrap();
         let elapsed = now.elapsed();
-        println!("    Part 1 [{:08.2?}]: {}", elapsed, answer);
+        println!("    Part 1 [{:09.2?}]: {}", elapsed, answer);
         let now = Instant::now();
         let answer = problem.part_two(&input).unwrap();
         let elapsed = now.elapsed();
-        println!("    Part 2 [{:08.2?}]: {}", elapsed, answer);
+        println!("    Part 2 [{:09.2?}]: {}", elapsed, answer);
     }
 }
 
 pub fn get_problem(day: usize) -> Option<Box<dyn Problem>> {
     match day {
-        1 => Some(Box::new(Day01::default())),
-        2 => Some(Box::new(Day02::default())),
-        3 => Some(Box::new(Day03::default())),
-        4 => Some(Box::new(Day04::default())),
+        1 => Some(Box::new(day01::Day01::default())),
+        2 => Some(Box::new(day02::Day02::default())),
+        3 => Some(Box::new(day03::Day03::default())),
+        4 => Some(Box::new(day04::Day04::default())),
+        5 => Some(Box::new(day05::Day05::default())),
         _ => None,
     }
 }

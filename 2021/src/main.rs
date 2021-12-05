@@ -89,7 +89,8 @@ fn main() -> Result<()> {
                 .parse::<_>()
                 .expect("Unable to parse input part");
             let answer = solve_problem(day, part)?;
-            submit_solution(day, part, answer)?;
+            let text = submit_solution(day, part, answer)?;
+            println!("{}", text);
             println!(
                 "Successfully submitted solution for day {} part {}",
                 day, part

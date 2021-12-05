@@ -58,7 +58,7 @@ impl Problem for Day03 {
 
 #[test]
 fn test_day_three_part_one() {
-    let prob = DayThree {};
+    let prob = Day03 {};
     let ans = prob.part_one(
         r#"00100
 11110
@@ -78,7 +78,7 @@ fn test_day_three_part_one() {
 
 #[test]
 fn test_day_three_part_two() {
-    let prob = DayThree {};
+    let prob = Day03 {};
     let ans = prob.part_two(
         r#"00100
 11110
