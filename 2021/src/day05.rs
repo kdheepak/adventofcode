@@ -24,29 +24,20 @@ impl Day05 {
       .collect()
   }
 
-  fn helper(&self, input: &str, part: usize) -> Option<String> {
+  fn helper(&self, input: &str, diag: bool) -> Option<String> {
     let lines = self.parse(input);
 
-    let max_x = lines
+    let size = lines
       .iter()
-      .map(|d| max(d.x1, d.x2))
+      .flat_map(|d| vec![d.x1, d.x2, d.y1, d.y2].into_iter())
       .reduce(max)
-      .expect("Unable to get max x")
-      + 1;
-    let max_y = lines
-      .iter()
-      .map(|d| max(d.y1, d.y2))
-      .reduce(max)
-      .expect("Unable to get max y")
+      .unwrap()
       + 1;
 
-    let mut map: DMatrix<usize> = DMatrix::zeros(max_x as usize, max_y as usize);
+    let mut map: DMatrix<usize> = DMatrix::zeros(size as usize, size as usize);
 
-    for d in lines.iter() {
+    for d in lines.iter().filter(|d| diag || !(d.x1 != d.x2 && d.y1 != d.y2)) {
       let Line { x1, y1, x2, y2 } = d;
-      if part == 1 && (x1 != x2 && y1 != y2) {
-        continue;
-      }
       let dx = (x2 - x1).signum();
       let dy = (y2 - y1).signum();
       let (mut x, mut y) = (*x1, *y1);
@@ -64,11 +55,11 @@ impl Day05 {
 
 impl Problem for Day05 {
   fn part1(&self, input: &str) -> Option<String> {
-    self.helper(input, 1)
+    self.helper(input, false)
   }
 
   fn part2(&self, input: &str) -> Option<String> {
-    self.helper(input, 2)
+    self.helper(input, true)
   }
 }
 
