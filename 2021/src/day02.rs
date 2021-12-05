@@ -2,9 +2,9 @@ use crate::problem::Problem;
 use serde_scan::scan;
 
 #[derive(Default)]
-pub struct DayTwo {}
+pub struct Day02 {}
 
-impl Problem for DayTwo {
+impl Problem for Day02 {
     fn part_one(&self, input: &str) -> Option<String> {
         let lines: Vec<(&str, usize)> = input
             .lines()

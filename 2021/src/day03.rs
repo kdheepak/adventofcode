@@ -1,7 +1,7 @@
 use crate::problem::Problem;
 
 #[derive(Default)]
-pub struct DayThree {}
+pub struct Day03 {}
 
 fn has_most_common_bit(bits: &[usize], bit: usize) -> bool {
     let mut total = [0, 0];
@@ -32,7 +32,7 @@ fn helper(input: &str, is_oxygen: bool) -> usize {
     bits[0]
 }
 
-impl Problem for DayThree {
+impl Problem for Day03 {
     fn part_one(&self, input: &str) -> Option<String> {
         let n = input.lines().next().unwrap().chars().count();
         let bits = input

@@ -1,9 +1,9 @@
 use crate::problem::Problem;
 
 #[derive(Default)]
-pub struct DayOne {}
+pub struct Day01 {}
 
-impl Problem for DayOne {
+impl Problem for Day01 {
     fn part_one(&self, input: &str) -> Option<String> {
         let ans = input
             .split_whitespace()

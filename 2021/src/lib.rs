@@ -5,9 +5,9 @@ pub mod day04;
 
 pub mod problem;
 
-use day01::DayOne;
-use day02::DayTwo;
-use day03::DayThree;
+use day01::Day01;
+use day02::Day02;
+use day03::Day03;
 use day04::Day04;
 
 use problem::Problem;
@@ -95,9 +95,9 @@ pub fn benchmark_problem(days: Vec<usize>) {
 
 pub fn get_problem(day: usize) -> Option<Box<dyn Problem>> {
     match day {
-        1 => Some(Box::new(DayOne::default())),
-        2 => Some(Box::new(DayTwo::default())),
-        3 => Some(Box::new(DayThree::default())),
+        1 => Some(Box::new(Day01::default())),
+        2 => Some(Box::new(Day02::default())),
+        3 => Some(Box::new(Day03::default())),
         4 => Some(Box::new(Day04::default())),
         _ => None,
     }
