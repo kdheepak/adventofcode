@@ -1,7 +1,7 @@
 use std::cmp::max;
 
+use itertools::Itertools;
 use nalgebra::DMatrix;
-use serde_scan::scan;
 
 use crate::problem::Problem;
 
@@ -19,7 +19,13 @@ impl Day05 {
   fn helper(&self, input: &str, diag: bool) -> Option<String> {
     let lines: Vec<Line> = input
       .lines()
-      .map(|l| scan!("{},{} -> {},{}" <- l).unwrap())
+      .filter_map(|l| {
+        l.split(" -> ")
+          .map(|s| s.split(','))
+          .flatten()
+          .map(|i| i.parse::<i64>().unwrap())
+          .collect_tuple()
+      })
       .map(|(x1, y1, x2, y2)| Line { x1, y1, x2, y2 })
       .collect();
 
