@@ -16,7 +16,7 @@ use problem::Problem;
 fn make_client() -> reqwest::blocking::Client {
   let mut headers = reqwest::header::HeaderMap::default();
   let cookie =
-    reqwest::header::HeaderValue::from_str(format!("session={}", env!("ADVENTOFCODE_SESSION")).as_str()).unwrap();
+    reqwest::header::HeaderValue::from_str(format!("session={}", std::env::var("ADVENTOFCODE_SESSION").expect("Unable to get advent of code session token")).as_str()).unwrap();
   headers.insert("Cookie", cookie);
   reqwest::blocking::Client::builder()
     .default_headers(headers)
