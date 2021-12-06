@@ -5,7 +5,7 @@ use crate::problem::Problem;
 
 #[derive(Default)]
 pub struct Day05 {}
-type Line = (i64, i64, i64, i64);
+type Line = (i16, i16, i16, i16);
 
 impl Day05 {
   fn helper(&self, input: &str, diag: bool) -> Option<String> {
