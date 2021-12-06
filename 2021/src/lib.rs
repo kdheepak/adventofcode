@@ -5,6 +5,7 @@ pub mod day02;
 pub mod day03;
 pub mod day04;
 pub mod day05;
+pub mod day06;
 
 pub mod problem;
 
@@ -15,8 +16,14 @@ use problem::Problem;
 
 fn make_client() -> reqwest::blocking::Client {
   let mut headers = reqwest::header::HeaderMap::default();
-  let cookie =
-    reqwest::header::HeaderValue::from_str(format!("session={}", std::env::var("ADVENTOFCODE_SESSION").expect("Unable to get advent of code session token")).as_str()).unwrap();
+  let cookie = reqwest::header::HeaderValue::from_str(
+    format!(
+      "session={}",
+      std::env::var("ADVENTOFCODE_SESSION").expect("Unable to get advent of code session token")
+    )
+    .as_str(),
+  )
+  .unwrap();
   headers.insert("Cookie", cookie);
   reqwest::blocking::Client::builder()
     .default_headers(headers)
@@ -100,6 +107,7 @@ pub fn get_problem(day: usize) -> Option<Box<dyn Problem>> {
     3 => Some(Box::new(day03::Day03::default())),
     4 => Some(Box::new(day04::Day04::default())),
     5 => Some(Box::new(day05::Day05::default())),
+    6 => Some(Box::new(day06::Day06::default())),
     _ => None,
   }
 }
