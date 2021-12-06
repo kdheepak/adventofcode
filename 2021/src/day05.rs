@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use nalgebra::dmatrix;
+use std::collections::HashMap;
 
 use crate::problem::Problem;
 
@@ -20,14 +20,7 @@ impl Day05 {
       })
       .collect();
 
-    let size = lines
-      .iter()
-      .flat_map(|d| vec![d.0, d.1, d.2, d.3])
-      .reduce(std::cmp::max)
-      .unwrap()
-      + 1;
-
-    let mut map = dmatrix![].resize(size as usize, size as usize, 0);
+    let mut map = HashMap::<(usize, usize), usize>::new();
 
     for d in lines.iter().filter(|d| diag || !(d.0 != d.2 && d.1 != d.3)) {
       let (x1, y1, x2, y2) = (d.0, d.1, d.2, d.3);
@@ -35,12 +28,16 @@ impl Day05 {
       let dy = (y2 - y1).signum();
       let (mut x, mut y) = (x1, y1);
       while (x, y) != (x2 + dx, y2 + dy) {
-        *map.get_mut((x as usize, y as usize)).unwrap() += 1;
+        if let Some(v) = map.get_mut(&(x as usize, y as usize)) {
+          *v += 1;
+        } else {
+          map.insert((x as usize, y as usize), 1);
+        }
         x += dx;
         y += dy;
       }
     }
-    Some((map.iter().filter(|v| **v > 1).count()).to_string())
+    Some((map.iter().filter(|((_,_), v)| **v > 1).count()).to_string())
   }
 }
 
