@@ -7,10 +7,8 @@ impl Day06 {
 }
 
 fn helper(input: &str, days: usize) -> usize {
-    let fish: Vec<usize> = input.split(',').map(|x| x.parse().unwrap()).collect();
     let mut counter = vec![0; 9];
-    // initialization
-    for f in fish { counter[f] += 1 }
+    input.split(',').for_each(|x| counter[x.parse::<usize>().unwrap()] += 1);
     for _ in 0..days {
       counter.rotate_left(1);
       counter[6]+=counter[8];
