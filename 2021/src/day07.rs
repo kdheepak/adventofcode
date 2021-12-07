@@ -1,5 +1,6 @@
-use crate::problem::Problem;
 use itertools::Itertools;
+
+use crate::problem::Problem;
 
 #[derive(Default)]
 pub struct Day07 {}
@@ -12,18 +13,18 @@ impl Problem for Day07 {
     let positions: Vec<i32> = input.split(',').map(|p| p.parse().unwrap()).collect();
     let (min, max) = positions.iter().minmax().into_option()?;
     (*min..=*max)
-      .map(|p1| positions.iter().fold(0, |acc, p2| acc + (p2 - p1).abs()))
+      .map(|p1| positions.iter().cloned().reduce(|acc, p2| acc + (p2 - p1).abs()))
       .min()
-      .map(|x| x.to_string())
+      .map(|x| x.unwrap().to_string())
   }
 
   fn part2(&self, input: &str) -> Option<String> {
     let positions: Vec<i32> = input.split(',').map(|p| p.parse().unwrap()).collect();
     let (min, max) = positions.iter().minmax().into_option()?;
     (*min..=*max)
-      .map(|p1| positions.iter().fold(0, |acc, p2| acc + (p2 - p1).abs() * ((p2 - p1).abs() + 1) / 2))
+      .map(|p1| positions.iter().cloned().reduce(|acc, p2| acc + (p2 - p1).abs() * ((p2 - p1).abs() + 1) / 2))
       .min()
-      .map(|x| x.to_string())
+      .map(|x| x.unwrap().to_string())
   }
 }
 
