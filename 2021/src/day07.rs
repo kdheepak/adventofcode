@@ -12,7 +12,7 @@ impl Problem for Day07 {
     let positions: Vec<i32> = input.split(',').map(|p| p.parse().unwrap()).collect();
     let (min, max) = positions.iter().minmax().into_option()?;
     (*min..=*max)
-      .map(|pos| positions.iter().fold(0, |acc, p| acc + (p - pos).abs()))
+      .map(|p1| positions.iter().fold(0, |acc, p2| acc + (p2 - p1).abs()))
       .min()
       .map(|x| x.to_string())
   }
@@ -21,7 +21,7 @@ impl Problem for Day07 {
     let positions: Vec<i32> = input.split(',').map(|p| p.parse().unwrap()).collect();
     let (min, max) = positions.iter().minmax().into_option()?;
     (*min..=*max)
-      .map(|pos| positions.iter().fold(0, |acc, p| acc + (p - pos).abs() * ((p - pos).abs() + 1) / 2))
+      .map(|p1| positions.iter().fold(0, |acc, p2| acc + (p2 - p1).abs() * ((p2 - p1).abs() + 1) / 2))
       .min()
       .map(|x| x.to_string())
   }
