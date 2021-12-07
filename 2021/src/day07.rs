@@ -8,7 +8,7 @@ impl Day07 {
 
 impl Problem for Day07 {
   fn part1(&self, input: &str) -> Option<String> {
-    let positions = input.split(',').map(|p| p.parse::<i32>().unwrap()).collect::<Vec<_>>();
+    let positions: Vec<i32> = input.split(',').map(|p| p.parse().unwrap()).collect();
     (*positions.iter().min().unwrap()..=*positions.iter().max().unwrap())
       .map(|pos| positions.iter().fold(0, |acc, p| acc + (p - pos) * (p - pos).signum()))
       .min()
@@ -16,7 +16,7 @@ impl Problem for Day07 {
   }
 
   fn part2(&self, input: &str) -> Option<String> {
-    let positions = input.split(',').map(|p| p.parse::<i32>().unwrap()).collect::<Vec<_>>();
+    let positions: Vec<i32> = input.split(',').map(|p| p.parse().unwrap()).collect();
     (*positions.iter().min().unwrap()..=*positions.iter().max().unwrap())
       .map(|pos| {
         positions.iter().fold(0, |acc, p| {
