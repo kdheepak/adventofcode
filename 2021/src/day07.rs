@@ -10,7 +10,7 @@ impl Problem for Day07 {
   fn part1(&self, input: &str) -> Option<String> {
     let positions: Vec<i32> = input.split(',').map(|p| p.parse().unwrap()).collect();
     (*positions.iter().min().unwrap()..=*positions.iter().max().unwrap())
-      .map(|pos| positions.iter().fold(0, |acc, p| acc + (p - pos) * (p - pos).signum()))
+      .map(|pos| positions.iter().fold(0, |acc, p| acc + (p - pos).abs()))
       .min()
       .map(|x| x.to_string())
   }
@@ -18,12 +18,7 @@ impl Problem for Day07 {
   fn part2(&self, input: &str) -> Option<String> {
     let positions: Vec<i32> = input.split(',').map(|p| p.parse().unwrap()).collect();
     (*positions.iter().min().unwrap()..=*positions.iter().max().unwrap())
-      .map(|pos| {
-        positions.iter().fold(0, |acc, p| {
-          let n = (p - pos) * (p - pos).signum();
-          acc + n * (n + 1) / 2
-        })
-      })
+      .map(|pos| positions.iter().fold(0, |acc, p| acc + (p - pos).abs() * ((p - pos).abs() + 1) / 2))
       .min()
       .map(|x| x.to_string())
   }
