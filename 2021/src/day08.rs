@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use std::collections::HashSet;
 
 use crate::problem::Problem;
 
@@ -9,114 +10,53 @@ impl Day08 {
 }
 
 fn fill_map(patterns: &str) -> Vec<String> {
-  let mut map = vec!["".to_string(); 10];
-  for pattern in patterns.split(' ') {
-    let pattern: String = pattern.chars().sorted().collect();
-    if pattern.len() == 2 {
-      map[1] = pattern;
-    } else if pattern.len() == 4 {
-      map[4] = pattern;
-    } else if pattern.len() == 7 {
-      map[8] = pattern;
-    } else if pattern.len() == 3 {
-      map[7] = pattern;
-    }
-  }
-  for pattern in patterns.split(' ') {
-    let pattern: String = pattern.chars().sorted().collect();
-    if map.contains(&pattern) {
-      continue;
-    } else if pattern.chars().count() == 6 {
-      if !map[1].chars().all(|p| pattern.contains(p)) {
-        map[6] = pattern;
-      } else if map[4].chars().all(|p| pattern.contains(p)) {
-        map[9] = pattern;
-      } else if !map[4].chars().all(|p| pattern.contains(p)) {
-        map[0] = pattern;
-      }
-    } else if pattern.chars().count() == 5 && map[1].chars().all(|p| pattern.contains(p)) {
-      map[3] = pattern;
-    }
-  }
-  let c = map[1].chars().filter(|c| !(map[6].contains(*c))).sorted().next().unwrap();
-  for pattern in patterns.split(' ') {
-    let pattern: String = pattern.chars().sorted().collect();
-    if map.contains(&pattern) {
-      continue;
-    } else if pattern.chars().count() == 5 {
-      if !pattern.contains(c) {
-        map[5] = pattern;
-      } else {
-        map[2] = pattern;
-      }
-    }
-  }
-  map
+  let mut unknown: Vec<HashSet<char>> = patterns.split(' ').map(|s| HashSet::from_iter(s.chars())).collect();
+  unknown.sort_by(|a, b| a.len().partial_cmp(&b.len()).unwrap());
+  let _1 = unknown[0].clone();
+  let _4 = unknown[2].clone();
+  let _7 = unknown[1].clone();
+  let _8 = unknown[9].clone();
+  unknown.retain(|x| x != &_8 && x != &_7 && x != &_4 && x != &_1);
+  let _9 = unknown.iter().find(|s| _4.intersection(s).collect::<HashSet<_>>().len() == 4).unwrap().clone(); unknown.retain(|x| x != &_9);
+  let _3 = unknown.iter().find(|s| s.difference(&_7).collect::<HashSet<_>>().len() == 2).unwrap().clone(); unknown.retain(|x| x != &_3);
+  let _2 = unknown.iter().find(|s| _9.intersection(s).collect::<HashSet<_>>().len() == 4).unwrap().clone(); unknown.retain(|x| x != &_2);
+  let _0 = unknown.iter().find(|s| _1.intersection(s).collect::<HashSet<_>>().len() == 2).unwrap().clone(); unknown.retain(|x| x != &_0);
+  let _6 = unknown.iter().find(|s| s.len() == 6).unwrap().clone(); unknown.retain(|x| x != &_6);
+  let _5 = unknown.get(0).unwrap().clone(); unknown.retain(|x| x != &_5);
+  let map = vec![_0, _1, _2, _3, _4, _5, _6, _7, _8, _9];
+  map.iter().map(|s| s.iter().sorted().collect::<String>()).collect()
 }
 
 impl Problem for Day08 {
   fn part1(&self, input: &str) -> Option<String> {
-    let all_patterns: Vec<&str> = input
-      .lines()
-      .map(|l| {
-        let (patterns, _) = l.split_once(" | ").unwrap();
-        patterns
-      })
-      .collect();
-
-    let all_outputs: Vec<&str> = input
-      .lines()
-      .map(|l| {
-        let (_, outputs) = l.split_once(" | ").unwrap();
-        outputs
-      })
-      .collect();
-
-    let mut map = vec![];
-    for patterns in all_patterns {
-      for pattern in patterns.split(' ') {
-        let pattern: String = pattern.chars().sorted().collect();
-        if pattern.len() == 2 || pattern.len() == 4 || pattern.len() == 7 || pattern.len() == 3 {
-          map.push(pattern);
-        }
-      }
-    }
-
-    let mut count = 0;
-    for outputs in all_outputs {
-      for output in outputs.split(' ') {
-        let output: String = output.chars().sorted().collect();
-        if map.contains(&output) {
-          count += 1;
-        }
-      }
-    }
-    Some(count.to_string())
-  }
-
-  fn part2(&self, input: &str) -> Option<String> {
-    let lines: Vec<(&str, &str)> = input
+    Some(input
       .lines()
       .map(|l| {
         let (patterns, outputs) = l.split_once(" | ").unwrap();
-        (patterns, outputs)
-      })
-      .collect();
+        let map = fill_map(patterns);
+        outputs.split(' ').rev().enumerate().map(|(_, output)| {
+          let output: String = output.chars().sorted().collect();
+          let x = map.iter().find_position(|s| *s == &output.to_string()).unwrap().0;
+          if x == 1 || x == 4 || x == 7 || x == 8 { 1 } else { 0 }
+        }
+        ).sum::<usize>()
+      }).sum::<usize>().to_string())
+  }
 
-    let mut sum = 0;
-    for (patterns, outputs) in lines {
-      let map = fill_map(patterns);
-      let mut num = vec![];
-      for output in outputs.split(' ') {
-        let output: String = output.chars().sorted().collect();
-        let x = map.iter().find_position(|s| *s == &output.to_string()).unwrap();
-        num.push(x.0);
-      }
-      let num: String = num.iter().map(|c| format!("{}", c)).collect();
-      sum += num.parse::<usize>().unwrap();
-    }
-
-    Some(sum.to_string())
+  fn part2(&self, input: &str) -> Option<String> {
+    Some(input
+      .lines()
+      .map(|l| {
+        let (patterns, outputs) = l.split_once(" | ").unwrap();
+        let map = fill_map(patterns);
+        outputs.split(' ').rev().enumerate().map(|(i, output)| {
+          let output: String = output.chars().sorted().collect();
+          let x = map.iter().find_position(|s| *s == &output.to_string()).unwrap().0;
+          let base: usize = 10;
+          base.pow(i as u32) * x
+        }
+        ).sum::<usize>()
+      }).sum::<usize>().to_string())
   }
 }
 
