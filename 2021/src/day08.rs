@@ -52,8 +52,7 @@ impl Problem for Day08 {
         outputs.split(' ').rev().enumerate().map(|(i, output)| {
           let output: String = output.chars().sorted().collect();
           let x = map.iter().find_position(|s| *s == &output.to_string()).unwrap().0;
-          let base: usize = 10;
-          base.pow(i as u32) * x
+          (10 as usize).pow(i as u32) * x
         }
         ).sum::<usize>()
       }).sum::<usize>().to_string())
