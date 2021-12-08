@@ -34,6 +34,8 @@ fn fill_map(patterns: &str) -> Vec<String> {
       } else if !map[4].chars().all(|p| pattern.contains(p)) {
         map[0] = pattern;
       }
+    } else if pattern.chars().count() == 5 && map[1].chars().all(|p| pattern.contains(p)) {
+      map[3] = pattern;
     }
   }
   let c = map[1].chars().filter(|c| !(map[6].contains(*c))).sorted().next().unwrap();
@@ -42,9 +44,7 @@ fn fill_map(patterns: &str) -> Vec<String> {
     if map.contains(&pattern) {
       continue;
     } else if pattern.chars().count() == 5 {
-      if map[1].chars().all(|p| pattern.contains(p)) {
-        map[3] = pattern;
-      } else if !pattern.contains(c) {
+      if !pattern.contains(c) {
         map[5] = pattern;
       } else {
         map[2] = pattern;
