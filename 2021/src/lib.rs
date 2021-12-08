@@ -7,6 +7,7 @@ pub mod day04;
 pub mod day05;
 pub mod day06;
 pub mod day07;
+pub mod day08;
 
 pub mod problem;
 
@@ -18,18 +19,12 @@ use problem::Problem;
 fn make_client() -> reqwest::blocking::Client {
   let mut headers = reqwest::header::HeaderMap::default();
   let cookie = reqwest::header::HeaderValue::from_str(
-    format!(
-      "session={}",
-      std::env::var("ADVENTOFCODE_SESSION").expect("Unable to get advent of code session token")
-    )
-    .as_str(),
+    format!("session={}", std::env::var("ADVENTOFCODE_SESSION").expect("Unable to get advent of code session token"))
+      .as_str(),
   )
   .unwrap();
   headers.insert("Cookie", cookie);
-  reqwest::blocking::Client::builder()
-    .default_headers(headers)
-    .build()
-    .unwrap()
+  reqwest::blocking::Client::builder().default_headers(headers).build().unwrap()
 }
 
 pub fn download_input(day: usize) -> Result<String> {
@@ -56,22 +51,14 @@ pub fn submit_solution(day: usize, level: usize, answer: String) -> Result<Strin
 }
 
 pub fn get_input(day: usize) -> String {
-  let input: PathBuf = [env!("CARGO_MANIFEST_DIR"), format!("inputs/day{:02}.txt", day).as_str()]
-    .iter()
-    .collect();
+  let input: PathBuf = [env!("CARGO_MANIFEST_DIR"), format!("inputs/day{:02}.txt", day).as_str()].iter().collect();
 
   if !input.exists() {
-    let s = download_input(day)
-      .with_context(|| format!("Unable to download input for day {:02}.", day))
-      .unwrap();
+    let s = download_input(day).with_context(|| format!("Unable to download input for day {:02}.", day)).unwrap();
     fs::write(&input, s).expect("Unable to write inputs to file");
   }
 
-  fs::read_to_string(input)
-    .expect("Unable to read inputs")
-    .trim_start()
-    .trim_end()
-    .to_string()
+  fs::read_to_string(input).expect("Unable to read inputs").trim_start().trim_end().to_string()
 }
 
 pub fn solve_problem(day: usize, part: usize) -> Result<String> {
@@ -110,6 +97,7 @@ pub fn get_problem(day: usize) -> Option<Box<dyn Problem>> {
     5 => Some(Box::new(day05::Day05::default())),
     6 => Some(Box::new(day06::Day06::default())),
     7 => Some(Box::new(day07::Day07::default())),
+    8 => Some(Box::new(day08::Day08::default())),
     _ => None,
   }
 }
