@@ -13,16 +13,9 @@ fn has_most_common_bit(bits: &[usize], bit: usize) -> bool {
 
 fn helper(input: &str, is_oxygen: bool) -> usize {
   let n = input.lines().next().unwrap().chars().count();
-  let mut bits = input
-    .lines()
-    .map(|item| usize::from_str_radix(item, 2).unwrap())
-    .collect::<Vec<_>>();
+  let mut bits = input.lines().map(|item| usize::from_str_radix(item, 2).unwrap()).collect::<Vec<_>>();
   for i in (0..n).rev() {
-    let keep = if is_oxygen {
-      has_most_common_bit(&bits, i) as usize
-    } else {
-      !has_most_common_bit(&bits, i) as usize
-    };
+    let keep = if is_oxygen { has_most_common_bit(&bits, i) as usize } else { !has_most_common_bit(&bits, i) as usize };
     bits.retain(|item| ((item >> i) & 1) == keep);
     if bits.len() == 1 {
       break;
@@ -35,15 +28,9 @@ fn helper(input: &str, is_oxygen: bool) -> usize {
 impl Problem for Day03 {
   fn part1(&self, input: &str) -> Option<String> {
     let n = input.lines().next().unwrap().chars().count();
-    let bits = input
-      .lines()
-      .map(|item| usize::from_str_radix(item, 2).unwrap())
-      .collect::<Vec<_>>();
+    let bits = input.lines().map(|item| usize::from_str_radix(item, 2).unwrap()).collect::<Vec<_>>();
 
-    let gamma: usize = (0..n)
-      .rev()
-      .map(|i| (has_most_common_bit(&bits, i) as usize) << i)
-      .sum();
+    let gamma: usize = (0..n).rev().map(|i| (has_most_common_bit(&bits, i) as usize) << i).sum();
     let base: u32 = 2;
     let epsilon = (!gamma) & (base.pow(n as u32) as usize - 1);
     Some((gamma * epsilon).to_string())

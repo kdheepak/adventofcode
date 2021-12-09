@@ -35,21 +35,14 @@ impl Board {
 
 fn parse_input(input: &str) -> (Vec<usize>, Vec<Board>) {
   let mut s = input.split("\n\n");
-  let draws = s
-    .next()
-    .unwrap()
-    .split(',')
-    .filter(|n| !n.is_empty())
-    .map(|n| n.parse::<usize>().unwrap())
-    .collect::<Vec<usize>>();
+  let draws =
+    s.next().unwrap().split(',').filter(|n| !n.is_empty()).map(|n| n.parse::<usize>().unwrap()).collect::<Vec<usize>>();
   let boards = s
     .map(|b| {
       Board {
-        0: Matrix5::from_iterator(b.lines().flat_map(|l| {
-          l.split_whitespace()
-            .filter_map(|i| i.parse::<usize>().ok())
-            .map(|x| (x, false))
-        })),
+        0: Matrix5::from_iterator(
+          b.lines().flat_map(|l| l.split_whitespace().filter_map(|i| i.parse::<usize>().ok()).map(|x| (x, false))),
+        ),
       }
     })
     .collect();

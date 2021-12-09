@@ -11,21 +11,10 @@ impl Day05 {
   fn helper(&self, input: &str, diag: bool) -> Option<String> {
     let lines: Vec<Line> = input
       .lines()
-      .filter_map(|l| {
-        l.split(" -> ")
-          .map(|s| s.split(','))
-          .flatten()
-          .map(|i| i.parse().unwrap())
-          .collect_tuple()
-      })
+      .filter_map(|l| l.split(" -> ").map(|s| s.split(',')).flatten().map(|i| i.parse().unwrap()).collect_tuple())
       .collect();
 
-    let size = lines
-      .iter()
-      .flat_map(|d| vec![d.0, d.1, d.2, d.3])
-      .reduce(std::cmp::max)
-      .unwrap()
-      + 1;
+    let size = lines.iter().flat_map(|d| vec![d.0, d.1, d.2, d.3]).reduce(std::cmp::max).unwrap() + 1;
 
     let mut map = dmatrix![].resize(size as usize, size as usize, 0);
 

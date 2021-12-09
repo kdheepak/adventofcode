@@ -15,60 +15,22 @@ pub fn generate_cli_app() -> App<'static> {
     .subcommand(
       App::new("submit")
         .arg(
-          Arg::new("day")
-            .short('d')
-            .long("day")
-            .takes_value(true)
-            .multiple_values(false)
-            .max_values(1)
-            .min_values(1),
+          Arg::new("day").short('d').long("day").takes_value(true).multiple_values(false).max_values(1).min_values(1),
         )
         .arg(
-          Arg::new("part")
-            .short('p')
-            .long("part")
-            .takes_value(true)
-            .multiple_values(true)
-            .max_values(1)
-            .min_values(1),
+          Arg::new("part").short('p').long("part").takes_value(true).multiple_values(true).max_values(1).min_values(1),
         ),
     )
     .subcommand(
-      App::new("benchmark").arg(
-        Arg::new("days")
-          .short('d')
-          .long("days")
-          .takes_value(true)
-          .multiple_values(true),
+      App::new("benchmark").arg(Arg::new("days").short('d').long("days").takes_value(true).multiple_values(true)),
+    )
+    .subcommand(
+      App::new("solve").arg(Arg::new("day").short('d').long("day").takes_value(true).multiple_values(false)).arg(
+        Arg::new("part").short('p').long("part").takes_value(true).multiple_values(true).max_values(1).min_values(1),
       ),
     )
     .subcommand(
-      App::new("solve")
-        .arg(
-          Arg::new("day")
-            .short('d')
-            .long("day")
-            .takes_value(true)
-            .multiple_values(false),
-        )
-        .arg(
-          Arg::new("part")
-            .short('p')
-            .long("part")
-            .takes_value(true)
-            .multiple_values(true)
-            .max_values(1)
-            .min_values(1),
-        ),
-    )
-    .subcommand(
-      App::new("download").arg(
-        Arg::new("day")
-          .short('d')
-          .long("day")
-          .takes_value(true)
-          .multiple_values(false),
-      ),
+      App::new("download").arg(Arg::new("day").short('d').long("day").takes_value(true).multiple_values(false)),
     );
   app
 }
