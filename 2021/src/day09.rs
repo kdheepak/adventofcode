@@ -77,11 +77,8 @@ impl Problem for Day09 {
         }
       }
     }
-    let mut basins = basins.values().sorted().rev();
-    let b1 = basins.next().unwrap();
-    let b2 = basins.next().unwrap();
-    let b3 = basins.next().unwrap();
-    Some((b1 * b2 * b3).to_string())
+    let ans = basins.values().sorted().rev().cloned().collect::<Vec<usize>>()[0..3].iter().product::<usize>();
+    Some(ans.to_string())
   }
 }
 
