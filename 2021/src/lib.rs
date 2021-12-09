@@ -40,6 +40,12 @@ pub fn download_input(day: usize) -> Result<String> {
   }
 }
 
+pub fn visualize_problem(day: usize) {
+  let input = get_input(day);
+  let problem = get_problem(day).expect("Unable to create problem.");
+  problem.visualize(&input);
+}
+
 pub fn submit_solution(day: usize, level: usize, answer: String) -> Result<String> {
   let client = make_client();
   let url = format!("https://adventofcode.com/2021/day/{}/answer", day);

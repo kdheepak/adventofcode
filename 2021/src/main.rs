@@ -30,6 +30,9 @@ pub fn generate_cli_app() -> App<'static> {
       ),
     )
     .subcommand(
+      App::new("visualize").arg(Arg::new("day").short('d').long("day").takes_value(true).multiple_values(false)),
+    )
+    .subcommand(
       App::new("download").arg(Arg::new("day").short('d').long("day").takes_value(true).multiple_values(false)),
     );
   app
@@ -63,6 +66,15 @@ fn main() -> Result<()> {
         .expect("Unable to parse input day");
       get_input(day);
       println!("Successfully downloaded input for day {}", day);
+    },
+    Some(("visualize", matches)) => {
+      let day = matches
+        .value_of("day")
+        .expect("Expected valid day command line input")
+        .parse::<_>()
+        .expect("Unable to parse input day");
+      visualize_problem(day);
+      println!("Done visualizuation for day {}", day);
     },
     Some(("solve", matches)) => {
       let day = matches
