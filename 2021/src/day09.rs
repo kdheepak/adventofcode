@@ -1,8 +1,27 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Duration};
 
+use crossterm::{
+  cursor,
+  event::{DisableMouseCapture, EnableMouseCapture, EventStream},
+  execute,
+  terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen},
+};
 use itertools::Itertools;
 
-use crate::problem::Problem;
+use crate::{
+  event::{destruct_terminal, setup_terminal, Event, EventConfig, Events, Key},
+  problem::Problem,
+};
+
+#[derive(Default)]
+pub struct App {
+  pub tick_rate: u64,
+}
+
+impl App {
+  pub fn update(&self) {
+  }
+}
 
 #[derive(Default)]
 pub struct Day09 {}
@@ -44,6 +63,29 @@ impl Problem for Day09 {
     }
     let ans = basins.values().sorted().rev().take(3).product::<usize>();
     Some(ans.to_string())
+  }
+
+  fn visualize(&self, _input: &str) {
+    let app = App { tick_rate: 250, ..App::default() };
+    let events = Events::with_config(EventConfig { tick_rate: Duration::from_millis(app.tick_rate) });
+    let mut terminal = setup_terminal();
+    loop {
+      terminal.draw(|f| {});
+      match events.next().unwrap() {
+        Event::Input(input) => {
+          match input {
+            Key::Char('q') => {
+              break;
+            },
+            _ => {},
+          }
+        },
+        Event::Tick => {
+          app.update();
+        },
+      };
+    }
+    destruct_terminal();
   }
 }
 

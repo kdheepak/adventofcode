@@ -1,5 +1,7 @@
 extern crate lazy_static;
 
+pub mod event;
+
 pub mod day01;
 pub mod day02;
 pub mod day03;
