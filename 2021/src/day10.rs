@@ -10,51 +10,43 @@ pub struct Day10 {}
 impl Day10 {
 }
 
-fn matches(c1: char, c2: char) -> bool {
-  c1 == '(' && c2 == ')' || c1 == '[' && c2 == ']' || c1 == '<' && c2 == '>' || c1 == '{' && c2 == '}'
+fn handle_char(stack: &mut Vec<char>, c: char) -> Option<usize> {
+  match c {
+    '(' | '{' | '[' | '<' => stack.push(c),
+    _ => {
+      match (stack.pop(), c) {
+        (Some('('), ')') => {},
+        (Some('['), ']') => {},
+        (Some('{'), '}') => {},
+        (Some('<'), '>') => {},
+        (_, ')') => return Some(3),
+        (_, ']') => return Some(57),
+        (_, '}') => return Some(1197),
+        (_, '>') => return Some(25137),
+        _ => unreachable!(),
+      }
+    },
+  }
+  None
 }
 
 fn get_syntax_error_score(line: &str) -> usize {
   let mut stack = vec![];
-  for char in line.chars() {
-    if "([<{".contains(char) {
-      stack.push(char);
-    } else if matches(*stack.last().unwrap(), char) {
-      stack.pop();
-    } else {
-      return match char {
-        ')' => 3,
-        ']' => 57,
-        '}' => 1197,
-        '>' => 25137,
-        _ => panic!("Unexpected char"),
-      };
-    }
-  }
-  0
+  line.chars().find_map(|c| handle_char(&mut stack, c)).unwrap_or(0)
 }
 
 fn complete_syntax(line: &str) -> usize {
   let mut stack = vec![];
-  for char in line.chars() {
-    if "([<{".contains(char) {
-      stack.push(char);
-    } else if matches(*stack.last().unwrap(), char) {
-      stack.pop();
-    }
-  }
-  let mut score = 0;
-  for char in stack.iter().rev() {
-    score *= 5;
-    score += match char {
-      '(' => 1,
-      '[' => 2,
-      '{' => 3,
-      '<' => 4,
+  line.chars().find_map(|c| handle_char(&mut stack, c)).unwrap();
+  stack.iter().rev().fold(0, |score, c| {
+    match c {
+      '(' => score * 5 + 1,
+      '[' => score * 5 + 2,
+      '{' => score * 5 + 3,
+      '<' => score * 5 + 4,
       _ => panic!("Unexpected char"),
     }
-  }
-  score
+  })
 }
 
 impl Problem for Day10 {
@@ -64,7 +56,12 @@ impl Problem for Day10 {
   }
 
   fn part2(&self, input: &str) -> Option<String> {
-    let scores = input.lines().filter(|line| get_syntax_error_score(line) == 0).map(complete_syntax).sorted().collect::<Vec<usize>>();
+    let scores = input
+      .lines()
+      .filter(|line| get_syntax_error_score(line) == 0)
+      .map(complete_syntax)
+      .sorted()
+      .collect::<Vec<usize>>();
     Some(scores[scores.len() / 2].to_string())
   }
 }
