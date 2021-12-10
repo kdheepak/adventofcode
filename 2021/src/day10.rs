@@ -96,7 +96,7 @@ mod tests {
 <{([([[(<>()){}]>(<<{{
 <{([{{}}[<[[[<>{}]]]>[]]"};
     assert_eq!(prob.part1(input), Some("26397".to_string()));
-    // assert_eq!(prob.part1(&crate::get_input(10)), None);
+    assert_eq!(prob.part1(&crate::get_input(10)), Some("271245".to_string()));
   }
 
   #[test]
@@ -112,7 +112,7 @@ mod tests {
 [<(<(<(<{}))><([]([]()
 <{([([[(<>()){}]>(<<{{
 <{([{{}}[<[[[<>{}]]]>[]]"};
-    assert_eq!(prob.part2(input), None);
-    // assert_eq!(prob.part2(&crate::get_input(10)), None);
+    assert_eq!(prob.part2(input), Some("288957".to_string()));
+    assert_eq!(prob.part2(&crate::get_input(10)), Some("1685293086".to_string()));
   }
 }
