@@ -37,7 +37,7 @@ fn get_syntax_error_score(line: &str) -> usize {
 
 fn complete_syntax(line: &str) -> usize {
   let mut stack = vec![];
-  line.chars().find_map(|c| handle_char(&mut stack, c)).unwrap();
+  line.chars().find_map(|c| handle_char(&mut stack, c)).unwrap_or(0);
   stack.iter().rev().fold(0, |score, c| {
     match c {
       '(' => score * 5 + 1,
