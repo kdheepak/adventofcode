@@ -10,16 +10,16 @@ pub struct Day10 {}
 impl Day10 {
 }
 
+fn matches(c1: char, c2: char) -> bool {
+  c1 == '(' && c2 == ')' || c1 == '[' && c2 == ']' || c1 == '<' && c2 == '>' || c1 == '{' && c2 == '}'
+}
+
 fn get_syntax_error_score(line: &str) -> usize {
   let mut stack = vec![];
   for char in line.chars() {
-    if char == '(' || char == '[' || char == '<' || char == '{' {
+    if "([<{".contains(char) {
       stack.push(char);
-    } else if (*stack.last().unwrap() == '(' && char == ')')
-      || (*stack.last().unwrap() == '[' && char == ']')
-      || (*stack.last().unwrap() == '{' && char == '}')
-      || (*stack.last().unwrap() == '<' && char == '>')
-    {
+    } else if matches(*stack.last().unwrap(), char) {
       stack.pop();
     } else {
       return match char {
@@ -37,16 +37,10 @@ fn get_syntax_error_score(line: &str) -> usize {
 fn complete_syntax(line: &str) -> usize {
   let mut stack = vec![];
   for char in line.chars() {
-    if char == '(' || char == '[' || char == '<' || char == '{' {
+    if "([<{".contains(char) {
       stack.push(char);
-    } else if (*stack.last().unwrap() == '(' && char == ')')
-      || (*stack.last().unwrap() == '[' && char == ']')
-      || (*stack.last().unwrap() == '{' && char == '}')
-      || (*stack.last().unwrap() == '<' && char == '>')
-    {
+    } else if matches(*stack.last().unwrap(), char) {
       stack.pop();
-    } else {
-      panic!("cannot be here")
     }
   }
   let mut score = 0;
@@ -70,8 +64,7 @@ impl Problem for Day10 {
   }
 
   fn part2(&self, input: &str) -> Option<String> {
-    let incomplete_lines = input.lines().filter(|line| get_syntax_error_score(line) == 0);
-    let scores = incomplete_lines.map(complete_syntax).sorted().collect::<Vec<usize>>();
+    let scores = input.lines().filter(|line| get_syntax_error_score(line) == 0).map(complete_syntax).sorted().collect::<Vec<usize>>();
     Some(scores[scores.len() / 2].to_string())
   }
 }
