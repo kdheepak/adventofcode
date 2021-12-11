@@ -149,7 +149,7 @@ mod tests {
   6882881134
   4846848554
   5283751526"};
-    assert_eq!(prob.part1(input), None);
+    assert_eq!(prob.part1(input), Some("1656".to_string()));
     assert_eq!(prob.part1(&crate::get_input(11)), Some("1591".to_string()));
   }
 
@@ -166,7 +166,7 @@ mod tests {
   6882881134
   4846848554
   5283751526"};
-    assert_eq!(prob.part2(input), None);
+    assert_eq!(prob.part2(input), Some("195".to_string()));
     assert_eq!(prob.part1(&crate::get_input(11)), Some("314".to_string()));
   }
 }
