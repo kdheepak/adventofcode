@@ -14,6 +14,7 @@ pub fn generate_cli_app() -> App<'static> {
     .license(crate_license!())
     .subcommand(
       App::new("submit")
+        .about("Submit solution for day and part to Advent of Code website.")
         .arg(
           Arg::new("day").short('d').long("day").takes_value(true).multiple_values(false).max_values(1).min_values(1),
         )
@@ -22,24 +23,36 @@ pub fn generate_cli_app() -> App<'static> {
         ),
     )
     .subcommand(
-      App::new("benchmark").arg(Arg::new("days").short('d').long("days").takes_value(true).multiple_values(true)),
+      App::new("benchmark")
+        .about("Benchmark solution for days.")
+        .arg(Arg::new("days").short('d').long("days").takes_value(true).multiple_values(true)),
     )
     .subcommand(
-      App::new("solve").arg(Arg::new("day").short('d').long("day").takes_value(true).multiple_values(false)).arg(
-        Arg::new("part").short('p').long("part").takes_value(true).multiple_values(true).max_values(1).min_values(1),
-      ),
+      App::new("solve")
+        .about("Solve solution for day and part.")
+        .arg(Arg::new("day").short('d').long("day").takes_value(true).multiple_values(false))
+        .arg(
+          Arg::new("part").short('p').long("part").takes_value(true).multiple_values(true).max_values(1).min_values(1),
+        ),
     )
     .subcommand(
-      App::new("visualize").arg(Arg::new("day").short('d').long("day").takes_value(true).multiple_values(false)),
+      App::new("visualize")
+        .about("Visualize solution for day.")
+        .arg(Arg::new("day").short('d').long("day").takes_value(true).multiple_values(false)),
     )
     .subcommand(
-      App::new("download").arg(Arg::new("day").short('d').long("day").takes_value(true).multiple_values(false)),
+      App::new("download")
+        .about("Download input for day.")
+        .arg(Arg::new("day").short('d').long("day").takes_value(true).multiple_values(false)),
     );
   app
 }
 
 fn main() -> Result<()> {
-  let app = generate_cli_app();
+  let mut app = generate_cli_app();
+  let mut help = Vec::new();
+  app.write_long_help(&mut help).unwrap();
+  let help = String::from_utf8(help).unwrap();
   let matches = app.get_matches();
   match matches.subcommand() {
     Some(("submit", matches)) => {
@@ -98,7 +111,9 @@ fn main() -> Result<()> {
         .collect();
       benchmark_problem(days);
     },
-    _ => {},
+    _ => {
+      println!("{}", help);
+    },
   }
   Ok(())
 }
