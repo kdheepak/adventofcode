@@ -12,8 +12,8 @@ impl Day13 {
 }
 
 fn visualize(map: &[Vec<bool>], xmax: usize, ymax: usize) {
-  for x in 0..xmax {
-    for y in 0..ymax {
+  for y in 0..ymax {
+    for x in 0..xmax {
       if map[y][x] {
         print!("#")
       } else {
@@ -25,79 +25,40 @@ fn visualize(map: &[Vec<bool>], xmax: usize, ymax: usize) {
   println!()
 }
 
-impl Problem for Day13 {
-  fn part1(&self, input: &str) -> Option<String> {
-    let (points, folds) = input.split_once("\n\n").unwrap();
-    let lines = points
-      .lines()
-      .map(|line| {
-        let (x, y) = line.split_once(',').unwrap();
-        (x.parse().unwrap(), y.parse().unwrap())
-      })
-      .collect::<Vec<(usize, usize)>>();
-    let xmax = lines.iter().map(|p| p.0).max().unwrap();
-    let ymax = lines.iter().map(|p| p.1).max().unwrap();
+fn fold(input: &str, part1: bool) -> (Vec<Vec<bool>>, usize, usize) {
+  let (points, folds) = input.split_once("\n\n").unwrap();
+  let lines = points
+    .lines()
+    .map(|line| {
+      let (x, y) = line.split_once(',').unwrap();
+      (x.parse().unwrap(), y.parse().unwrap())
+    })
+    .collect::<Vec<(usize, usize)>>();
+  let mut xmax = lines.iter().map(|p| p.0).max().unwrap();
+  let mut ymax = lines.iter().map(|p| p.1).max().unwrap();
 
-    let mut map = vec![vec![false; xmax + 1]; ymax + 1];
+  if xmax % 2 != 0 {
+    xmax += 1;
+  }
+  if ymax % 2 != 0 {
+    ymax += 1;
+  }
+  let mut map = vec![vec![false; xmax + 1]; ymax + 1];
 
-    for (x, y) in lines {
-      map[y][x] = true
+  for (x, y) in lines {
+    map[y][x] = true
+  }
+
+  for (i, fold) in folds.lines().enumerate() {
+    if i == 1 && part1 {
+      break;
     }
-
-    let fold = folds.lines().take(1).next().unwrap().replace("fold along ", "");
+    let fold = fold.replace("fold along ", "");
     let (fold_type, axis) = fold.split_once("=").unwrap();
     let axis = axis.parse::<usize>().unwrap();
 
-    dbg!(fold_type, axis, xmax, ymax);
-    if fold_type == "y" {
-      for y in 1..(map.len() / 2 + 1) {
-        for x in 0..map[0].len() {
-          if map[axis + y][x] {
-            map[axis - y][x] = map[axis + y][x];
-            map[axis + y][x] = false;
-          }
-        }
-      }
-    } else if fold_type == "x" {
-      for x in 1..(map[0].len() / 2 + 1) {
-        for y in 0..map.len() {
-          if map[y][axis + x] {
-            map[y][axis - x] = map[y][axis + x];
-            map[y][axis + x] = false;
-          }
-        }
-      }
-    }
-
-    let ans = map.iter().map(|row| row.iter().filter(|p| **p).count()).sum::<usize>();
-
-    Some(ans.to_string())
-  }
-
-  fn part2(&self, input: &str) -> Option<String> {
-    let (points, folds) = input.split_once("\n\n").unwrap();
-    let lines = points
-      .lines()
-      .map(|line| {
-        let (x, y) = line.split_once(',').unwrap();
-        (x.parse().unwrap(), y.parse().unwrap())
-      })
-      .collect::<Vec<(usize, usize)>>();
-    let mut xmax = lines.iter().map(|p| p.0).max().unwrap();
-    let mut ymax = lines.iter().map(|p| p.1).max().unwrap();
-
-    let mut map = vec![vec![false; xmax + 1]; ymax + 2];
-
-    for (x, y) in lines {
-      map[y][x] = true
-    }
-
-    for fold in folds.lines() {
-      let fold = fold.replace("fold along ", "");
-      let (fold_type, axis) = fold.split_once("=").unwrap();
-      let axis = axis.parse::<usize>().unwrap();
-
-      if fold_type == "y" {
+    match fold_type {
+      "y" => {
         ymax = axis;
         for y in 1..(map.len() / 2 + 1) {
           for x in 0..map[0].len() {
@@ -107,7 +68,8 @@ impl Problem for Day13 {
             }
           }
         }
-      } else if fold_type == "x" {
+      },
+      "x" => {
         xmax = axis;
         for x in 1..(map[0].len() / 2 + 1) {
           for y in 0..map.len() {
@@ -117,12 +79,36 @@ impl Problem for Day13 {
             }
           }
         }
-      }
+      },
+      _ => panic!("Unknown fold type"),
     }
+  }
 
-    visualize(&map, xmax, ymax);
+  (map, xmax, ymax)
+}
 
-    None
+impl Problem for Day13 {
+  fn part1(&self, input: &str) -> Option<String> {
+    let (map, _, _) = fold(input, true);
+    let ans = map.iter().map(|row| row.iter().filter(|p| **p).count()).sum::<usize>();
+    Some(ans.to_string())
+  }
+
+  fn part2(&self, input: &str) -> Option<String> {
+    let (map, xmax, ymax) = fold(input, false);
+    let mut ans = String::new();
+    ans = format!("{}{}", ans, "\n");
+    for row in map.iter().take(ymax) {
+      for item in row.iter().take(xmax) {
+        if *item {
+          ans = format!("{}{}", ans, "#")
+        } else {
+          ans = format!("{}{}", ans, " ")
+        }
+      }
+      ans = format!("{}{}", ans, "\n")
+    }
+    Some(ans)
   }
 }
 
