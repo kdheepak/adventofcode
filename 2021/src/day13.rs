@@ -29,30 +29,21 @@ fn fold(input: &str, part1: bool) -> (Vec<Vec<bool>>, usize, usize) {
   let (points, folds) = input.split_once("\n\n").unwrap();
   let lines = points
     .lines()
-    .map(|line| {
-      let (x, y) = line.split_once(',').unwrap();
-      (x.parse().unwrap(), y.parse().unwrap())
-    })
+    .map(|line| line.split_once(',').unwrap())
+    .map(|(x, y)| (x.parse().unwrap(), y.parse().unwrap()))
     .collect::<Vec<(usize, usize)>>();
   let mut xmax = lines.iter().map(|p| p.0).max().unwrap();
   let mut ymax = lines.iter().map(|p| p.1).max().unwrap();
 
-  if xmax % 2 != 0 {
-    xmax += 1;
-  }
-  if ymax % 2 != 0 {
-    ymax += 1;
-  }
+  if xmax % 2 != 0 { xmax += 1 }
+  if ymax % 2 != 0 { ymax += 1 }
+
   let mut map = vec![vec![false; xmax + 1]; ymax + 1];
 
-  for (x, y) in lines {
-    map[y][x] = true
-  }
+  for (x, y) in lines { map[y][x] = true }
 
   for (i, fold) in folds.lines().enumerate() {
-    if i == 1 && part1 {
-      break;
-    }
+    if i == 1 && part1 { break; }
     let fold = fold.replace("fold along ", "");
     let (fold_type, axis) = fold.split_once("=").unwrap();
     let axis = axis.parse::<usize>().unwrap();
