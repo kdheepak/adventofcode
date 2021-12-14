@@ -21,7 +21,7 @@ impl Problem for Day14 {
 
     let mut template = template.to_string();
 
-    for step in 0..10 {
+    for _ in 0..10 {
       let mut insertions = vec![];
 
       for (i, (c1, c2)) in template.chars().tuple_windows().enumerate() {
@@ -41,6 +41,7 @@ impl Problem for Day14 {
       .map(|c| template.chars().filter(|v| *v == c).count())
       .sorted()
       .collect::<Vec<usize>>();
+
     Some((ans.last().unwrap() - ans.first().unwrap()).to_string())
   }
 
