@@ -74,50 +74,6 @@ impl Problem for Day14 {
   }
 }
 
-fn reduce_rules1(rules: &mut HashMap<&str, String>, _: &str) {
-  let mut updates = vec![];
-  for (k1, v1) in rules.iter() {
-    let mut insertions = vec![];
-    for (i, (c1, c2)) in k1.chars().tuple_windows().enumerate() {
-      if let Some(v) = rules.get(format!("{}{}", c1, c2).as_str()) {
-        insertions.push((i, v))
-      }
-    }
-    let mut copy = String::new();
-    for (i, v) in insertions.iter().rev() {
-      let (a, c) = k1.split_at(*i + 1);
-      copy = format!("{}{}{}", a, v, c);
-    }
-    updates.push((k1.to_owned(), copy));
-  }
-
-  for (k, v) in updates.iter() {
-    *rules.entry(k).or_default() = v.to_string();
-  }
-}
-
-fn reduce_rules2(rules: &mut HashMap<&str, String>, _: &str) {
-  let mut updates = vec![];
-  for (k1, v1) in rules.iter() {
-    let mut insertions = vec![];
-    for (i, (c1, c2)) in v1.chars().tuple_windows().enumerate() {
-      if let Some(v) = rules.get(format!("{}{}", c1, c2).as_str()) {
-        insertions.push((i, v))
-      }
-    }
-    let mut copy = String::new();
-    for (i, v) in insertions.iter().rev() {
-      let (a, c) = v1.split_at(*i + 1);
-      copy = format!("{}{}{}", a, v, c);
-    }
-    updates.push((k1.to_owned(), copy));
-  }
-
-  for (k, v) in updates.iter() {
-    *rules.entry(k).or_default() = v.to_string();
-  }
-}
-
 #[cfg(test)]
 mod tests {
   use indoc::indoc;
