@@ -40,12 +40,9 @@ impl PartialOrd for State {
 }
 
 fn solve(map: Vec<Vec<usize>>) -> i64 {
-  let start = (0, 0);
-  let end = ((map.len() - 1) as i64, (map[0].len() - 1) as i64);
-
   let mut heap = BinaryHeap::new();
   let mut seen = HashSet::new();
-  heap.push(State { cost: 0, position: start });
+  heap.push(State { cost: 0, position: (0, 0) });
   while let Some(State { cost, position }) = heap.pop() {
     let (x, y) = position;
     if !seen.insert((x, y)) {
@@ -56,7 +53,7 @@ fn solve(map: Vec<Vec<usize>>) -> i64 {
       let new_y = y + dy;
       if new_x >= 0 && new_x < map.len() as i64 && new_y >= 0 && new_y < map[0].len() as i64 {
         let r = map[new_x as usize][new_y as usize];
-        if (new_x, new_y) == (end.0, end.1) {
+        if (new_x, new_y) == ((map.len() - 1) as i64, (map[0].len() - 1) as i64) {
           return (cost + r) as i64;
         }
         heap.push(State { cost: cost + r, position: (new_x, new_y) });
@@ -72,8 +69,7 @@ impl Problem for Day15 {
       input.lines().map(|line| line.chars().map(|c| c.to_string().parse::<usize>().unwrap()).collect()).collect();
 
     let r = solve(map);
-    dbg!(r);
-    None
+    Some(r.to_string())
   }
 
   fn part2(&self, input: &str) -> Option<String> {
@@ -90,8 +86,7 @@ impl Problem for Day15 {
     }
 
     let r = solve(new_map);
-    dbg!(r);
-    None
+    Some(r.to_string())
   }
 }
 
@@ -100,6 +95,7 @@ mod tests {
   use indoc::indoc;
 
   use super::*;
+  use crate::get_input;
 
   #[test]
   fn test_day15_part1() {
@@ -114,12 +110,12 @@ mod tests {
 3125421639
 1293138521
 2311944581"};
-    assert_eq!(prob.part1(input), None);
+    assert_eq!(prob.part1(input), Some("40".to_string()));
+    assert_eq!(prob.part1(&get_input(15)), Some("423".to_string()));
   }
 
   #[test]
   fn test_day15_part2() {
-    let prob = Day15 {};
     let prob = Day15 {};
     let input = indoc! {"1163751742
 1381373672
@@ -131,6 +127,7 @@ mod tests {
 3125421639
 1293138521
 2311944581"};
-    assert_eq!(prob.part2(input), None);
+    assert_eq!(prob.part2(input), Some("315".to_string()));
+    assert_eq!(prob.part2(&get_input(15)), Some("2778".to_string()));
   }
 }
