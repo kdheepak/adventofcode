@@ -61,14 +61,14 @@ fn solve(map: Vec<Vec<usize>>) -> Option<i64> {
 impl Problem for Day15 {
   fn part1(&self, input: &str) -> Option<String> {
     let map: Vec<Vec<usize>> =
-      input.lines().map(|line| line.chars().map(|c| c.to_string().parse::<usize>().unwrap()).collect()).collect();
+      input.lines().map(|line| line.chars().map(|c| c.to_string().parse().unwrap()).collect()).collect();
 
     Some(solve(map).unwrap().to_string())
   }
 
   fn part2(&self, input: &str) -> Option<String> {
     let map: Vec<Vec<usize>> =
-      input.lines().map(|line| line.chars().map(|c| c.to_string().parse::<usize>().unwrap()).collect()).collect();
+      input.lines().map(|line| line.chars().map(|c| c.to_string().parse().unwrap()).collect()).collect();
     let mut new_map = vec![vec![0; map[0].len() * 5]; map.len() * 5];
     for (ix, iy) in (0..5).cartesian_product(0..5) {
       for (x, y) in (0..map.len()).cartesian_product(0..map[0].len()) {
