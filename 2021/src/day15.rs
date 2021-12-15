@@ -48,8 +48,7 @@ fn solve(map: Vec<Vec<usize>>) -> Option<usize> {
     let (x, y) = position;
     if !seen.insert((x, y)) { continue; }
     for (dx, dy) in [(0, 1), (1, 0), (-1, 0), (0, -1)] {
-      let new_x = x + dx;
-      let new_y = y + dy;
+      let (new_x, new_y) = (x + dx, y + dy);
       if new_x < 0 || new_x > xmax || new_y < 0 || new_y > ymax { continue; }
       let cost = map[new_x as usize][new_y as usize] + cost;
       if (new_x, new_y) == (xmax, ymax) { return Some(cost); }
