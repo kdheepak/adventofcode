@@ -63,25 +63,20 @@ impl Problem for Day15 {
     let map: Vec<Vec<usize>> =
       input.lines().map(|line| line.chars().map(|c| c.to_string().parse::<usize>().unwrap()).collect()).collect();
 
-    let r = solve(map).unwrap();
-    Some(r.to_string())
+    Some(solve(map).unwrap().to_string())
   }
 
   fn part2(&self, input: &str) -> Option<String> {
     let map: Vec<Vec<usize>> =
       input.lines().map(|line| line.chars().map(|c| c.to_string().parse::<usize>().unwrap()).collect()).collect();
-
     let mut new_map = vec![vec![0; map[0].len() * 5]; map.len() * 5];
-
     for (ix, iy) in (0..5).cartesian_product(0..5) {
       for (x, y) in (0..map.len()).cartesian_product(0..map[0].len()) {
         let r = if map[x][y] + ix + iy > 9 { map[x][y] + ix + iy - 9 } else { map[x][y] + ix + iy };
         new_map[x + ix * map.len()][y + iy * map[0].len()] = r;
       }
     }
-
-    let r = solve(new_map).unwrap();
-    Some(r.to_string())
+    Some(solve(new_map).unwrap().to_string())
   }
 }
 
