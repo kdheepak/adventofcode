@@ -60,7 +60,7 @@ fn solve(map: Vec<Vec<usize>>) -> i64 {
       }
     }
   }
-  panic!("no path found")
+  panic!("wat")
 }
 
 impl Problem for Day15 {
