@@ -50,9 +50,9 @@ fn solve(map: Vec<Vec<usize>>) -> Option<i64> {
       let new_x = x + dx;
       let new_y = y + dy;
       if new_x < 0 || new_x >= map.len() as i64 || new_y < 0 || new_y >= map[0].len() as i64 { continue; }
-      let r = map[new_x as usize][new_y as usize];
-      if (new_x, new_y) == ((map.len() - 1) as i64, (map[0].len() - 1) as i64) { return Some((cost + r) as i64); }
-      heap.push(State { cost: cost + r, position: (new_x, new_y) });
+      let cost = map[new_x as usize][new_y as usize] + cost;
+      if (new_x, new_y) == ((map.len() - 1) as i64, (map[0].len() - 1) as i64) { return Some((cost) as i64); }
+      heap.push(State { cost, position: (new_x, new_y) });
     }
   }
   None
