@@ -45,19 +45,14 @@ fn solve(map: Vec<Vec<usize>>) -> Option<i64> {
   heap.push(State { cost: 0, position: (0, 0) });
   while let Some(State { cost, position }) = heap.pop() {
     let (x, y) = position;
-    if !seen.insert((x, y)) {
-      continue;
-    }
+    if !seen.insert((x, y)) { continue; }
     for (dx, dy) in [(0, 1), (1, 0), (-1, 0), (0, -1)] {
       let new_x = x + dx;
       let new_y = y + dy;
-      if new_x >= 0 && new_x < map.len() as i64 && new_y >= 0 && new_y < map[0].len() as i64 {
-        let r = map[new_x as usize][new_y as usize];
-        if (new_x, new_y) == ((map.len() - 1) as i64, (map[0].len() - 1) as i64) {
-          return Some((cost + r) as i64);
-        }
-        heap.push(State { cost: cost + r, position: (new_x, new_y) });
-      }
+      if new_x < 0 || new_x >= map.len() as i64 || new_y < 0 || new_y >= map[0].len() as i64 { continue; }
+      let r = map[new_x as usize][new_y as usize];
+      if (new_x, new_y) == ((map.len() - 1) as i64, (map[0].len() - 1) as i64) { return Some((cost + r) as i64); }
+      heap.push(State { cost: cost + r, position: (new_x, new_y) });
     }
   }
   None
