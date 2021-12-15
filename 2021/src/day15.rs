@@ -39,7 +39,7 @@ impl PartialOrd for State {
   }
 }
 
-fn solve(map: Vec<Vec<usize>>) -> i64 {
+fn solve(map: Vec<Vec<usize>>) -> Option<i64> {
   let mut heap = BinaryHeap::new();
   let mut seen = HashSet::new();
   heap.push(State { cost: 0, position: (0, 0) });
@@ -54,13 +54,13 @@ fn solve(map: Vec<Vec<usize>>) -> i64 {
       if new_x >= 0 && new_x < map.len() as i64 && new_y >= 0 && new_y < map[0].len() as i64 {
         let r = map[new_x as usize][new_y as usize];
         if (new_x, new_y) == ((map.len() - 1) as i64, (map[0].len() - 1) as i64) {
-          return (cost + r) as i64;
+          return Some((cost + r) as i64);
         }
         heap.push(State { cost: cost + r, position: (new_x, new_y) });
       }
     }
   }
-  panic!("wat")
+  None
 }
 
 impl Problem for Day15 {
@@ -68,7 +68,7 @@ impl Problem for Day15 {
     let map: Vec<Vec<usize>> =
       input.lines().map(|line| line.chars().map(|c| c.to_string().parse::<usize>().unwrap()).collect()).collect();
 
-    let r = solve(map);
+    let r = solve(map).unwrap();
     Some(r.to_string())
   }
 
@@ -85,7 +85,7 @@ impl Problem for Day15 {
       }
     }
 
-    let r = solve(new_map);
+    let r = solve(new_map).unwrap();
     Some(r.to_string())
   }
 }
