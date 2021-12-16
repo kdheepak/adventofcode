@@ -10,6 +10,7 @@ repository = "https://github.com/kdheepak/adventofcode/tree/main/2021"
 
 [dependencies]
 ansi_term = "0.12.1"
+hex = "0.4.3"
 anyhow = "1.0.43"
 async-std = { version = "1.10.0", features = ["attributes", "unstable"] }
 clap = "3.0.0-beta.5"
