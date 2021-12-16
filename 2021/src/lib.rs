@@ -1,3 +1,7 @@
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+
 extern crate lazy_static;
 
 pub mod event;
@@ -17,6 +21,7 @@ pub mod day12;
 pub mod day13;
 pub mod day14;
 pub mod day15;
+pub mod day16;
 
 pub mod problem;
 
@@ -120,6 +125,7 @@ pub fn get_problem(day: usize) -> Option<Box<dyn Problem>> {
     13 => Some(Box::new(day13::Day13::default())),
     14 => Some(Box::new(day14::Day14::default())),
     15 => Some(Box::new(day15::Day15::default())),
+    16 => Some(Box::new(day16::Day16::default())),
     _ => None,
   }
 }
