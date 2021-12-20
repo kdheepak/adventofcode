@@ -33,13 +33,13 @@ fn display(image: &HashMap<(i64, i64), bool>) {
   }
 }
 
-fn calculate_pixel(image: &HashMap<(i64, i64), bool>, xy: (i64, i64), algorithm: &[bool]) -> bool {
+fn calculate_pixel(image: &HashMap<(i64, i64), bool>, xy: (i64, i64), algorithm: &[bool], default: bool) -> bool {
   let (x, y) = xy;
   let mut acc = 0;
   let mut i = 0;
   for row_d in [-1i8, 0, 1] {
     for col_d in [-1i8, 0, 1] {
-      let b = *image.get(&(x + row_d as i64, y + col_d as i64)).unwrap_or(&false);
+      let b = *image.get(&(x + row_d as i64, y + col_d as i64)).unwrap_or(&default);
       acc |= (1 << (9 - i - 1)) * (b as usize);
       i += 1;
     }
@@ -60,7 +60,8 @@ impl Problem for Day20 {
 
     // display(&image);
     let extent = 3;
-    for _ in 0..2 {
+    let mut default = false;
+    for _ in 0..50 {
       let x_min = image.keys().map(|(x, _)| x).min().unwrap() - extent;
       let x_max = image.keys().map(|(x, _)| x).max().unwrap() + extent;
       let y_min = image.keys().map(|(_, y)| y).min().unwrap() - extent;
@@ -68,11 +69,12 @@ impl Problem for Day20 {
       let mut output = image.clone();
       for y in y_min..=y_max {
         for x in x_min..=x_max {
-          *output.entry((x, y)).or_default() = calculate_pixel(&image, (x, y), &algorithm);
+          *output.entry((x, y)).or_default() = calculate_pixel(&image, (x, y), &algorithm, default);
         }
       }
       image = output;
-      display(&image);
+      default = !default;
+      // display(&image);
     }
     Some(image.values().filter(|v| **v).count().to_string())
   }
