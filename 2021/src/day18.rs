@@ -24,7 +24,7 @@ enum Pair {
 impl Pair {
   fn new(input: &str) -> Self {
     if let Ok(num) = input.parse() {
-      Pair::Node(num)
+      Self::Node(num)
     } else {
       let mut depth = 0;
       let mut split_point = 0;
@@ -36,21 +36,24 @@ impl Pair {
           _ => (),
         }
       }
-      Pair::Link {
+      Self::Link {
         left: Box::new(Self::new(&input[1..split_point])),
         right: Box::new(Self::new(&input[(split_point + 1)..(input.len() - 1)])),
       }
     }
   }
 
-  fn reduce(&mut self) {
-    while self.explode(0).is_some() || self.split().is_some() {}
+  fn magnitude(&self) -> usize {
+    match self {
+      Self::Node(v) => *v as usize,
+      Self::Link { left: l, right: r } => 3 * l.magnitude() + 2 * r.magnitude(),
+    }
   }
 
   fn absorb(&mut self, from_left: bool, v: usize) {
     match self {
-      Pair::Node(prev) => *prev += v,
-      Pair::Link { left: l, right: r } => {
+      Self::Node(prev) => *prev += v,
+      Self::Link { left: l, right: r } => {
         match from_left {
           true => l.absorb(from_left, v),
           false => r.absorb(from_left, v),
@@ -60,27 +63,27 @@ impl Pair {
   }
 
   fn explode(&mut self, depth: usize) -> Option<(usize, usize)> {
-    if let Pair::Node(_) = self {
+    if let Self::Node(_) = self {
       None
-    } else if let Pair::Link { left: l, right: r } = self {
+    } else if let Self::Link { left: l, right: r } = self {
       if depth == 4 {
         let a = match **l {
-          Pair::Node(v) => v,
+          Self::Node(v) => v,
           _ => unreachable!(),
         };
-        let b = match **l {
-          Pair::Node(v) => v,
+        let b = match **r {
+          Self::Node(v) => v,
           _ => unreachable!(),
         };
-        *self = Pair::Node(0);
+        *self = Self::Node(0);
         Some((a, b))
       } else {
         if let Some((a, b)) = l.explode(depth + 1) {
           r.absorb(true, b);
           return Some((a, 0));
         }
-        if let Some((a, b)) = l.explode(depth + 1) {
-          r.absorb(false, a);
+        if let Some((a, b)) = r.explode(depth + 1) {
+          l.absorb(false, a);
           Some((0, b))
         } else {
           None
@@ -93,18 +96,18 @@ impl Pair {
 
   fn split(&mut self) -> Option<()> {
     match self {
-      Pair::Node(val) => {
-        if *val >= 10 {
-          *self = Pair::Link {
-            left: Box::new(Pair::Node((*val as f32 / 2.0).floor() as usize)),
-            right: Box::new(Pair::Node((*val as f32 / 2.0).ceil() as usize)),
+      Self::Node(v) => {
+        if *v >= 10 {
+          *self = Self::Link {
+            left: Box::new(Self::Node((*v as f32 / 2.0).floor() as usize)),
+            right: Box::new(Self::Node((*v as f32 / 2.0).ceil() as usize)),
           };
           Some(())
         } else {
           None
         }
       },
-      Pair::Link { left, right } => {
+      Self::Link { left, right } => {
         if left.split().is_some() {
           return Some(());
         }
@@ -115,34 +118,38 @@ impl Pair {
       },
     }
   }
-
-  fn magnitude(&self) -> usize {
-    match self {
-      Pair::Node(val) => *val as usize,
-      Pair::Link { left: l, right: r } => 3 * l.magnitude() + 2 * r.magnitude(),
-    }
-  }
 }
 
 fn add(x: &Pair, y: &Pair) -> Pair {
-  let mut r = Pair::Link { left: Box::new(x.to_owned()), right: Box::new(x.to_owned()) };
-  r.reduce();
-  r
+  let mut res = Pair::Link { left: Box::new(x.clone()), right: Box::new(y.clone()) };
+  while res.explode(0).is_some() || res.split().is_some() {}
+  res
+}
+
+fn solve_1(input: &[Pair]) -> Option<String> {
+  let res = input.iter().skip(1).fold(input[0].clone(), |acc, nxt| add(&acc, nxt));
+  Some(res.magnitude().to_string())
+}
+
+fn solve_2(input: &[Pair]) -> Option<String> {
+  let limit = input.len() - 1;
+  let res = (0..limit).permutations(2).fold(0, |acc, e| {
+    let a_p_b = add(&input[e[0]], &input[e[1]]).magnitude();
+    let b_p_a = add(&input[e[0]], &input[e[1]]).magnitude();
+    std::cmp::max(acc, a_p_b.max(b_p_a))
+  });
+  Some(res.to_string())
 }
 
 impl Problem for Day18 {
   fn part1(&self, input: &str) -> Option<String> {
-    let pairs = input.lines().map(Pair::new).collect::<Vec<Pair>>();
-    let mut acc = pairs[0].clone();
-    for (i, p) in pairs.iter().enumerate().skip(1) {
-      println!("{}", i);
-      acc = add(&acc, p);
-    }
-    Some(acc.magnitude().to_string())
+    let input = input.split('\n').map(Pair::new).collect::<Vec<Pair>>();
+    solve_1(&input)
   }
 
   fn part2(&self, input: &str) -> Option<String> {
-    None
+    let input = input.split('\n').map(Pair::new).collect::<Vec<Pair>>();
+    solve_2(&input)
   }
 }
 
