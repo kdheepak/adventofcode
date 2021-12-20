@@ -47,40 +47,45 @@ fn calculate_pixel(image: &HashMap<(i64, i64), bool>, xy: (i64, i64), algorithm:
   algorithm[acc]
 }
 
+fn solve(input: &str, step: usize) -> Option<String> {
+  let (algorithm, image) = input.split_once("\n\n").unwrap();
+  let algorithm = algorithm.lines().join("").chars().map(|c| c == '#').collect::<Vec<bool>>();
+  assert!(algorithm.len() == 512);
+  let mut image = image
+    .lines()
+    .enumerate()
+    .flat_map(|(x, l)| l.chars().enumerate().map(|(y, c)| ((x as i64, y as i64), c == '#')).collect::<Vec<_>>())
+    .collect::<HashMap<(i64, i64), bool>>();
+
+  // display(&image);
+  let extent = 3;
+  let mut default = false;
+  for _ in 0..step {
+    let x_min = image.keys().map(|(x, _)| x).min().unwrap() - extent;
+    let x_max = image.keys().map(|(x, _)| x).max().unwrap() + extent;
+    let y_min = image.keys().map(|(_, y)| y).min().unwrap() - extent;
+    let y_max = image.keys().map(|(_, y)| y).max().unwrap() + extent;
+    let mut output = image.clone();
+    for y in y_min..=y_max {
+      for x in x_min..=x_max {
+        *output.entry((x, y)).or_default() = calculate_pixel(&image, (x, y), &algorithm, default);
+      }
+    }
+    image = output;
+    if algorithm[0] {
+      default = !default;
+    }
+  }
+  Some(image.values().filter(|v| **v).count().to_string())
+}
+
 impl Problem for Day20 {
   fn part1(&self, input: &str) -> Option<String> {
-    let (algorithm, image) = input.split_once("\n\n").unwrap();
-    let algorithm = algorithm.lines().join("").chars().map(|c| c == '#').collect::<Vec<bool>>();
-    assert!(algorithm.len() == 512);
-    let mut image = image
-      .lines()
-      .enumerate()
-      .flat_map(|(x, l)| l.chars().enumerate().map(|(y, c)| ((x as i64, y as i64), c == '#')).collect::<Vec<_>>())
-      .collect::<HashMap<(i64, i64), bool>>();
-
-    // display(&image);
-    let extent = 3;
-    let mut default = false;
-    for _ in 0..50 {
-      let x_min = image.keys().map(|(x, _)| x).min().unwrap() - extent;
-      let x_max = image.keys().map(|(x, _)| x).max().unwrap() + extent;
-      let y_min = image.keys().map(|(_, y)| y).min().unwrap() - extent;
-      let y_max = image.keys().map(|(_, y)| y).max().unwrap() + extent;
-      let mut output = image.clone();
-      for y in y_min..=y_max {
-        for x in x_min..=x_max {
-          *output.entry((x, y)).or_default() = calculate_pixel(&image, (x, y), &algorithm, default);
-        }
-      }
-      image = output;
-      default = !default;
-      // display(&image);
-    }
-    Some(image.values().filter(|v| **v).count().to_string())
+    solve(input, 2)
   }
 
   fn part2(&self, input: &str) -> Option<String> {
-    None
+    solve(input, 50)
   }
 }
 
@@ -108,13 +113,25 @@ mod tests {
 ##..#
 ..#..
 ..###"};
-    assert_eq!(prob.part1(input), None);
+    assert_eq!(prob.part1(input), Some("35".to_string()));
   }
 
   #[test]
   fn test_day20_part2() {
     let prob = Day20 {};
-    let input = indoc! {""};
-    assert_eq!(prob.part2(input), None);
+    let input = indoc! {"..#.#..#####.#.#.#.###.##.....###.##.#..###.####..#####..#....#..#..##..##
+#..######.###...####..#..#####..##..#.#####...##.#.#..#.##..#.#......#.###
+.######.###.####...#.##.##..#..#..#####.....#.#....###..#.##......#.....#.
+.#..#..##..#...##.######.####.####.#.#...#.......#..#.#.#...####.##.#.....
+.#..#...##.#.##..#...##.#.##..###.#......#.#.......#.#.#.####.###.##...#..
+...####.#..#..#.##.#....##..#.####....##...##..#...#......#.#.......#.....
+..##..####..#...#.#.#...##..#.#..###..#####........#..####......#..#
+
+#..#.
+#....
+##..#
+..#..
+..###"};
+    assert_eq!(prob.part2(&get_input(20)), Some("21149".to_string()));
   }
 }
