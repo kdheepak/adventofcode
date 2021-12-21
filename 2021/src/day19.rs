@@ -15,8 +15,8 @@ pub struct Day19 {}
 impl Day19 {
 }
 
-fn rotate((x, y, z): (i64, i64, i64), rot: u8) -> (i64, i64, i64) {
-  match rot {
+fn rotate((x, y, z): (i64, i64, i64), rotation: u8) -> (i64, i64, i64) {
+  match rotation {
     0 => (x, y, z),
     1 => (x, z, -y),
     2 => (x, -y, -z),
@@ -46,8 +46,8 @@ fn rotate((x, y, z): (i64, i64, i64), rot: u8) -> (i64, i64, i64) {
 }
 
 fn combine(total_scanners: &mut HashSet<(i64, i64, i64)>, scanner: &[(i64, i64, i64)]) -> Option<(i64, i64, i64)> {
-  for rot in 0..24 {
-    let rotated_scan = scanner.iter().map(|&v| rotate(v, rot)).collect::<Vec<_>>();
+  for rotation in 0..24 {
+    let rotated_scan = scanner.iter().map(|&v| rotate(v, rotation)).collect::<Vec<_>>();
     let distances = total_scanners
       .iter()
       .cartesian_product(&rotated_scan)
