@@ -47,13 +47,13 @@ fn rotate((x, y, z): (i64, i64, i64), rotation: u8) -> (i64, i64, i64) {
 
 fn combine(total_scanners: &mut HashSet<(i64, i64, i64)>, scanner: &[(i64, i64, i64)]) -> Option<(i64, i64, i64)> {
   for rotation in 0..24 {
-    let rotated_scan = scanner.iter().map(|&v| rotate(v, rotation)).collect::<Vec<_>>();
+    let rotated_scanner = scanner.iter().map(|&v| rotate(v, rotation)).collect::<Vec<_>>();
     let distances = total_scanners
       .iter()
-      .cartesian_product(&rotated_scan)
+      .cartesian_product(&rotated_scanner)
       .map(|((x1, y1, z1), (x2, y2, z2))| (x1 - x2, y1 - y2, z1 - z2));
     for (dx, dy, dz) in distances {
-      let translated = rotated_scan.iter().map(|(x, y, z)| (x + dx, y + dy, z + dz));
+      let translated = rotated_scanner.iter().map(|(x, y, z)| (x + dx, y + dy, z + dz));
       if translated.clone().filter(|v| total_scanners.contains(v)).count() >= 12 {
         total_scanners.extend(translated);
         return Some((dx, dy, dz));
