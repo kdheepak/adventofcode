@@ -15,35 +15,38 @@ pub struct Day21 {}
 impl Day21 {
 }
 
-fn f(
-  s: &mut HashMap<(usize, usize, usize, usize), (usize, usize)>,
-  p1: usize,
-  p2: usize,
-  s1: usize,
-  s2: usize,
-) -> (usize, usize) {
+type Cache = HashMap<(usize, usize, usize, usize, bool), (usize, usize)>;
+
+fn game(c: &mut Cache, p1: usize, p2: usize, s1: usize, s2: usize, turn: bool) -> (usize, usize) {
   if s1 >= 21 {
     return (1, 0);
   }
   if s2 >= 21 {
     return (0, 1);
   }
-  if s.contains_key(&(p1, p2, s1, s2)) {
-    return s[&(p1, p2, s1, s2)];
+  if c.contains_key(&(p1, p2, s1, s2, turn)) {
+    return c[&(p1, p2, s1, s2, turn)];
   }
+  let (p, s) = match turn {
+    true => (p1, s1),
+    false => (p2, s2),
+  };
   let mut ans = (0, 0);
   for d1 in [1, 2, 3] {
     for d2 in [1, 2, 3] {
       for d3 in [1, 2, 3] {
-        let t = (p1 + d1 + d2 + d3 - 1) % 10 + 1;
-        let st = s1 + t;
-        let (x, y) = f(s, p2, t, s2, st);
-        ans.0 += y;
-        ans.1 += x;
+        let t = (p + d1 + d2 + d3 - 1) % 10 + 1;
+        let st = s + t;
+        let (x, y) = match turn {
+          true => game(c, t, p2, st, s2, false),
+          false => game(c, p1, t, s1, st, true),
+        };
+        ans.0 += x;
+        ans.1 += y;
       }
     }
   }
-  *s.entry((p1, p2, s1, s2)).or_default() = ans;
+  *c.entry((p1, p2, s1, s2, turn)).or_default() = ans;
   ans
 }
 
@@ -82,7 +85,7 @@ impl Problem for Day21 {
       p2.split_once(": ").unwrap().1.parse::<usize>().unwrap(),
     );
     let mut s = HashMap::new();
-    let (s1, s2) = f(&mut s, p1, p2, 0, 0);
+    let (s1, s2) = game(&mut s, p1, p2, 0, 0, true);
     Some(std::cmp::max(s1, s2).to_string())
   }
 }
