@@ -41,7 +41,7 @@ fn rotate((x, y, z): (i64, i64, i64), rotation: u8) -> (i64, i64, i64) {
     21 => (-z, y, x),
     22 => (-z, -x, y),
     23 => (-z, -y, -x),
-    _ => unreachable!(),
+    _ => panic!("Invalid rotation."),
   }
 }
 
