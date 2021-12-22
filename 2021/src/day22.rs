@@ -10,16 +10,18 @@ use itertools::Itertools;
 use crate::problem::Problem;
 
 #[derive(Default)]
-pub struct Day21 {}
+pub struct Day22 {}
 
-impl Day21 {
+impl Day22 {
 }
 
-impl Problem for Day21 {
+impl Problem for Day22 {
   fn part1(&self, input: &str) -> Option<String> {
+    None
   }
 
   fn part2(&self, input: &str) -> Option<String> {
+    None
   }
 }
 
@@ -31,15 +33,15 @@ mod tests {
   use crate::get_input;
 
   #[test]
-  fn test_day21_part1() {
-    let prob = Day21 {};
+  fn test_day22_part1() {
+    let prob = Day22 {};
     let input = indoc! {""};
     assert_eq!(prob.part1(input), None);
   }
 
   #[test]
-  fn test_day21_part2() {
-    let prob = Day21 {};
+  fn test_day22_part2() {
+    let prob = Day22 {};
     let input = indoc! {""};
     assert_eq!(prob.part2(input), None);
   }
