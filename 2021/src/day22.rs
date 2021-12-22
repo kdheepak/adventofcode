@@ -1,5 +1,5 @@
 use std::{
-  cmp::Ordering,
+  cmp::{max, min, Ordering},
   collections::{BinaryHeap, HashMap, HashSet, VecDeque},
   ops::Add,
 };
@@ -15,45 +15,49 @@ pub struct Day22 {}
 impl Day22 {
 }
 type Border = (i64, i64);
-type Cube = (Border, Border, Border);
+type Cube = (Border, Border, Border, bool);
 
-fn intersection(cube1: Cube, cube2: Cube) -> Option<Cube> {
-  let ((x_min1, x_max1), (y_min1, y_max1), (z_min1, z_max1)) = cube1;
-  let ((x_min2, x_max2), (y_min2, y_max2), (z_min2, z_max2)) = cube2;
+fn volume(((x_min, x_max), (y_min, y_max), (z_min, z_max), _): Cube) -> i64 {
+  (x_max - x_min + 1) * (y_max - y_min + 1) * (z_max - z_min + 1)
+}
 
-  if x_min1 > x_max2 || x_min2 > x_max1 || y_min1 > y_max2 || y_min2 > y_max1 || z_min1 > z_max2 || z_min2 > z_max1 {
+fn range((min1, max1): (i64, i64), (min2, max2): (i64, i64)) -> Option<(i64, i64)> {
+  if max1 < min2 {
     return None;
   }
-  Some((
-    (std::cmp::max(x_min1, x_min2), std::cmp::min(x_max1, x_max2)),
-    (std::cmp::max(y_min1, y_min2), std::cmp::min(y_max1, y_max2)),
-    (std::cmp::max(y_min1, x_min2), std::cmp::min(y_max1, y_max2)),
-  ))
-}
-
-fn difference(cube1: Cube, cube2: Cube) -> Vec<Cube> {
-  if let Some(c) = intersection(cube1, cube2) {
-    let mut subcubes = vec![];
-    let ((x_min1, x_max1), (y_min1, y_max1), (z_min1, z_max1)) = cube1;
-    let ((x_min2, x_max2), (y_min2, y_max2), (z_min2, z_max2)) = c;
-    subcubes.push(((x_min1, x_max1), (y_min1, y_max1), (z_min1, z_max2 - 1)));
-    subcubes.push(((x_min1, x_max1), (y_min1, y_max1), (z_min2 + 1, z_max1)));
-    subcubes.push(((x_min1, x_max1), (y_min1, y_max2 - 1), (z_min2, z_max2)));
-    subcubes.push(((x_min1, x_max1), (y_min2 + 1, y_max1), (z_min2, z_max2)));
-    subcubes.push(((x_min1, x_max2 - 1), (y_min2, y_max2), (z_min2, z_max2)));
-    subcubes.push(((x_min2 + 1, x_max1), (y_min2, y_max2), (z_min2, z_max2)));
-    let mut v = vec![];
-    for (x, y, z) in subcubes {
-      if x.0 <= x.1 && y.0 <= y.1 && z.0 <= z.1 {
-        v.push((x, y, z))
-      }
-    }
-    v
-  } else {
-    vec![cube1]
+  if min1 > max2 {
+    return None;
   }
+  let _min = min(max(min1, min2), max2);
+  let _max = min(max(max1, min2), max2);
+  Some((_min, _max))
 }
 
+fn subcube(cube1: Cube, cube2: Cube) -> Option<Cube> {
+  let xr = range(cube1.0, cube2.0)?;
+  let yr = range(cube1.1, cube2.1)?;
+  let zr = range(cube1.2, cube2.2)?;
+  Some((xr, yr, zr, cube1.3))
+}
+
+fn corrected_volume(c: Cube, rest: &[Cube]) -> i64 {
+  let mut v = volume(c);
+  let subcubes = rest.iter().filter_map(|&c2| subcube(c2, c)).collect::<Vec<_>>();
+  for i in 0..subcubes.len() {
+    v -= corrected_volume(subcubes[i], &subcubes[i + 1..]);
+  }
+  v
+}
+
+fn total_volume(cubes: &[Cube]) -> i64 {
+  let mut v = 0;
+  for i in 0..cubes.len() {
+    if cubes[i].3 {
+      v += corrected_volume(cubes[i], &cubes[i + 1..]);
+    }
+  }
+  v
+}
 impl Problem for Day22 {
   fn part1(&self, input: &str) -> Option<String> {
     let mut cube = HashMap::new();
@@ -86,7 +90,7 @@ impl Problem for Day22 {
   }
 
   fn part2(&self, input: &str) -> Option<String> {
-    let borders = input
+    let cubes = input
       .lines()
       .map(|l| {
         // on x=-15..36,y=-36..8,z=-12..33
@@ -103,29 +107,10 @@ impl Problem for Day22 {
         let (x_min, x_max) = (x_min.split_once('=').unwrap().1.parse::<i64>().unwrap(), x_max.parse::<i64>().unwrap());
         let (y_min, y_max) = (y_min.split_once('=').unwrap().1.parse::<i64>().unwrap(), y_max.parse::<i64>().unwrap());
         let (z_min, z_max) = (z_min.split_once('=').unwrap().1.parse::<i64>().unwrap(), z_max.parse::<i64>().unwrap());
-        (x_min, x_max, y_min, y_max, z_min, z_max, status)
+        ((x_min, x_max), (y_min, y_max), (z_min, z_max), status)
       })
       .collect::<Vec<_>>();
-
-    let mut cubes = vec![];
-    for border in borders {
-      let (x_min, x_max, y_min, y_max, z_min, z_max, status) = border;
-      let mut new_cubes = vec![];
-      let this_cube = ((x_min, x_max), (y_min, y_max), (z_min, z_max));
-      for cube in cubes {
-        new_cubes.extend(difference(cube, this_cube))
-      }
-      if status {
-        new_cubes.push(this_cube)
-      }
-      cubes = new_cubes
-    }
-    let mut s = 0;
-    for cube in cubes {
-      let ((x_min, x_max), (y_min, y_max), (z_min, z_max)) = cube;
-      s += (x_max - x_min + 1) * (y_max - y_min + 1) * (z_max - z_min + 1)
-    }
-    Some(s.to_string())
+    Some(total_volume(&cubes).to_string())
   }
 }
 
