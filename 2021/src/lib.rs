@@ -28,6 +28,7 @@ pub mod day18;
 pub mod day19;
 pub mod day20;
 pub mod day21;
+pub mod day22;
 
 pub mod problem;
 
@@ -137,6 +138,7 @@ pub fn get_problem(day: usize) -> Option<Box<dyn Problem>> {
     19 => Some(Box::new(day19::Day19::default())),
     20 => Some(Box::new(day20::Day20::default())),
     21 => Some(Box::new(day21::Day21::default())),
+    22 => Some(Box::new(day22::Day22::default())),
     _ => None,
   }
 }
