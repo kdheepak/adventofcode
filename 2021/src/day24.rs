@@ -31,8 +31,7 @@ impl Problem for Day24 {
             _ => unreachable!(),
           };
         },
-        "add" => {
-        },
+        "add" => {},
         "mul" => {},
         "div" => {},
         "mod" => {},
